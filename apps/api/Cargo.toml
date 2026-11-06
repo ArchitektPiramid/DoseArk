@@ -1,0 +1,27 @@
+[package]
+name = "doseark-api"
+version = "0.1.1"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+axum.workspace = true
+chrono.workspace = true
+dotenvy.workspace = true
+doseark_application = { path = "../../crates/doseark_application" }
+doseark_contracts = { path = "../../crates/doseark_contracts" }
+doseark_db_postgres = { path = "../../crates/doseark_db_postgres" }
+doseark_db_sqlite = { path = "../../crates/doseark_db_sqlite" }
+doseark_domain = { path = "../../crates/doseark_domain" }
+doseark_runtime_config = { path = "../../crates/doseark_runtime_config" }
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-appender.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
