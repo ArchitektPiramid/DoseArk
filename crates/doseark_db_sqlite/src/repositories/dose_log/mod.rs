@@ -1,17 +1,23 @@
 mod history;
 mod mapping;
 mod nutrient_snapshot_writer;
+mod queries;
+mod serving;
+mod stock;
 
 use async_trait::async_trait;
 use chrono::Utc;
 use doseark_application::{
-    validated_serving_multiplier, ApplicationError, ApplicationResult, DoseLogRepository,
+    ApplicationError, ApplicationResult, DoseLogRepository,
 };
 use doseark_domain::{CreateDoseLogInput, DoseLog, DoseLogListInput, DoseLogPage, UpdateDoseLogInput};
-use sqlx::{Sqlite, SqlitePool, Transaction};
+use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use self::mapping::{DoseInventoryLotRow, DoseLogRow};
+use self::mapping::DoseLogRow;
+use self::queries::{get_dose_log, insert_dose_log, update_dose_log_row};
+use self::serving::validated_multiplier_for_product;
+use self::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
 use self::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
 use crate::repositories::inventory_lot::normalize_stock_quantity;
 use crate::repositories::transaction::begin_immediate;
@@ -292,251 +298,4 @@ impl DoseLogRepository for SqliteDoseLogRepository {
 
         DoseLog::try_from(row)
     }
-}
-
-async fn insert_dose_log(
-    tx: &mut Transaction<'_, Sqlite>,
-    dose_log_id: Uuid,
-    input: CreateDoseLogInput,
-    now: chrono::DateTime<Utc>,
-) -> ApplicationResult<DoseLogRow> {
-    sqlx::query_as::<_, DoseLogRow>(
-        r#"
-        INSERT INTO dose_logs (
-            id,
-            product_id,
-            inventory_lot_id,
-            taken_at,
-            units_taken,
-            unit,
-            serving_multiplier,
-            reason,
-            notes,
-            status,
-            cancelled_at,
-            cancellation_reason,
-            created_at,
-            updated_at
-        )
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 'active', NULL, NULL, ?10, ?11)
-        RETURNING
-            id,
-            product_id,
-            inventory_lot_id,
-            taken_at,
-            units_taken,
-            unit,
-            serving_multiplier,
-            reason,
-            notes,
-            status,
-            cancelled_at,
-            cancellation_reason,
-            created_at,
-            updated_at
-        "#,
-    )
-    .bind(dose_log_id.to_string())
-    .bind(input.product_id.to_string())
-    .bind(input.inventory_lot_id.map(|id| id.to_string()))
-    .bind(input.taken_at)
-    .bind(input.units_taken)
-    .bind(input.unit)
-    .bind(input.serving_multiplier)
-    .bind(input.reason)
-    .bind(input.notes)
-    .bind(now)
-    .bind(now)
-    .fetch_one(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))
-}
-
-async fn update_dose_log_row(
-    tx: &mut Transaction<'_, Sqlite>,
-    id: Uuid,
-    input: UpdateDoseLogInput,
-    now: chrono::DateTime<Utc>,
-) -> ApplicationResult<DoseLogRow> {
-    sqlx::query_as::<_, DoseLogRow>(
-        r#"
-        UPDATE dose_logs
-        SET
-            product_id = ?2,
-            inventory_lot_id = ?3,
-            taken_at = ?4,
-            units_taken = ?5,
-            unit = ?6,
-            serving_multiplier = ?7,
-            reason = ?8,
-            notes = ?9,
-            updated_at = ?10
-        WHERE id = ?1
-        RETURNING
-            id,
-            product_id,
-            inventory_lot_id,
-            taken_at,
-            units_taken,
-            unit,
-            serving_multiplier,
-            reason,
-            notes,
-            status,
-            cancelled_at,
-            cancellation_reason,
-            created_at,
-            updated_at
-        "#,
-    )
-    .bind(id.to_string())
-    .bind(input.product_id.to_string())
-    .bind(input.inventory_lot_id.map(|value| value.to_string()))
-    .bind(input.taken_at)
-    .bind(input.units_taken)
-    .bind(input.unit)
-    .bind(input.serving_multiplier)
-    .bind(input.reason)
-    .bind(input.notes)
-    .bind(now)
-    .fetch_optional(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))?
-    .ok_or_else(|| ApplicationError::NotFound(format!("Dose log not found: {id}")))
-}
-
-async fn get_dose_log(
-    tx: &mut Transaction<'_, Sqlite>,
-    id: Uuid,
-) -> ApplicationResult<DoseLogRow> {
-    sqlx::query_as::<_, DoseLogRow>(
-        r#"
-        SELECT
-            id,
-            product_id,
-            inventory_lot_id,
-            taken_at,
-            units_taken,
-            unit,
-            serving_multiplier,
-            reason,
-            notes,
-            status,
-            cancelled_at,
-            cancellation_reason,
-            created_at,
-            updated_at
-        FROM dose_logs
-        WHERE id = ?1
-        "#,
-    )
-    .bind(id.to_string())
-    .fetch_optional(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))?
-    .ok_or_else(|| ApplicationError::NotFound(format!("Dose log not found: {id}")))
-}
-
-async fn get_lot(
-    tx: &mut Transaction<'_, Sqlite>,
-    lot_id: Uuid,
-) -> ApplicationResult<DoseInventoryLotRow> {
-    sqlx::query_as::<_, DoseInventoryLotRow>(
-        r#"
-        SELECT id, product_id, units_remaining
-        FROM inventory_lots
-        WHERE id = ?1
-        "#,
-    )
-    .bind(lot_id.to_string())
-    .fetch_optional(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))?
-    .ok_or_else(|| ApplicationError::NotFound(format!("Inventory lot not found: {lot_id}")))
-}
-
-fn validate_lot_for_dose(
-    lot: Option<&DoseInventoryLotRow>,
-    product_id: Uuid,
-    units_taken: f64,
-) -> ApplicationResult<()> {
-    let Some(lot) = lot else {
-        return Ok(());
-    };
-
-    if lot.product_id_uuid() != product_id {
-        return Err(ApplicationError::Validation(
-            "Selected inventory lot belongs to another product".into(),
-        ));
-    }
-
-    if lot.units_remaining < units_taken {
-        return Err(ApplicationError::Validation(
-            "Not enough stock in selected inventory lot".into(),
-        ));
-    }
-
-    Ok(())
-}
-
-async fn update_lot_stock(
-    tx: &mut Transaction<'_, Sqlite>,
-    lot_id: Uuid,
-    quantity_after: f64,
-) -> ApplicationResult<()> {
-    let result = sqlx::query(
-        r#"
-        UPDATE inventory_lots
-        SET
-            units_remaining = ?2,
-            status = CASE
-                WHEN ?2 = 0 THEN 'empty'
-                WHEN status = 'empty' AND ?2 > 0 THEN 'active'
-                ELSE status
-            END,
-            updated_at = ?3
-        WHERE id = ?1
-        "#,
-    )
-    .bind(lot_id.to_string())
-    .bind(quantity_after)
-    .bind(Utc::now())
-    .execute(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))?;
-
-    if result.rows_affected() == 0 {
-        return Err(ApplicationError::NotFound(format!(
-            "Inventory lot not found: {lot_id}"
-        )));
-    }
-
-    Ok(())
-}
-
-/// Loads the product serving definition within the ongoing SQLite write transaction.
-async fn validated_multiplier_for_product(
-    tx: &mut Transaction<'_, Sqlite>,
-    product_id: Uuid,
-    units_taken: f64,
-    unit: &str,
-    requested_multiplier: f64,
-) -> ApplicationResult<f64> {
-    let product: Option<(f64, String)> = sqlx::query_as(
-        "SELECT serving_size_units, serving_unit FROM products WHERE id = ?1",
-    )
-    .bind(product_id.to_string())
-    .fetch_optional(&mut **tx)
-    .await
-    .map_err(|err| ApplicationError::Repository(err.to_string()))?;
-
-    let (serving_size, serving_unit) = product
-        .ok_or_else(|| ApplicationError::NotFound(format!("Product not found: {product_id}")))?;
-    validated_serving_multiplier(
-        units_taken,
-        unit,
-        requested_multiplier,
-        serving_size,
-        &serving_unit,
-    )
 }
