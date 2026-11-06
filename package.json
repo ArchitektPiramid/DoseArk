@@ -1,0 +1,25 @@
+{
+  "name": "doseark",
+  "private": true,
+  "description": "Local-first and server-capable supplement, medicine, inventory, and dose tracking application.",
+  "packageManager": "pnpm@10.34.3",
+  "author": "ArchitektPiramid",
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm dev:web",
+    "dev:web": "pnpm --filter @doseark/web dev",
+    "dev:api": "cargo run -p doseark-api",
+    "build": "pnpm build:web && cargo build",
+    "build:web": "pnpm --filter @doseark/web build",
+    "preview:web": "pnpm --filter @doseark/web preview",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "check": "pnpm typecheck && pnpm lint",
+    "api": "cargo run -p doseark-api",
+    "version:check": "node tools/check-versions.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.2",
+    "typescript": "6.0.3"
+  }
+}

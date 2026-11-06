@@ -1,0 +1,22 @@
+{
+  "configVersion": 2,
+  "defaultApiProfileId": "local",
+  "apiProfiles": [
+    {
+      "id": "local",
+      "name": "Local DoseArk API",
+      "description": "Local web frontend connected to a locally running Rust API.",
+      "mode": "web-remote",
+      "baseUrl": "http://localhost:8080",
+      "healthPath": "/api/health",
+      "requestTimeoutMs": 5000,
+      "database": {
+        "type": "sqlite",
+        "name": "doseark",
+        "path": "./data/doseark.sqlite",
+        "sslMode": "prefer"
+      },
+      "backupPath": "./data/backups"
+    }
+  ]
+}

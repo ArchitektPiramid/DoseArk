@@ -1,0 +1,57 @@
+# local/runtime files and generated build output
+node_modules/
+.pnpm-store/
+dist/
+build/
+coverage/
+.vite/
+target/
+*.tsbuildinfo
+_packages/
+
+# local environment files (keep safe templates)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+!**/.env.*.example
+
+# local data, medical records, credentials or backups
+# PRIV ONLY
+data/
+logs/
+*.db
+*.db3
+*.sqlite
+*.sqlite3
+config/profiles.json
+config/credentials.json
+config/credentials.local.json
+docker/medtaker/data/
+docker/medtaker/backups/
+
+# OLD
+#docs/*
+docs/priv/
+
+
+# local files
+scripts/*
+!scripts/tests/
+!scripts/tests/**
+tools/*
+
+# editors, OS, temporary stuff
+.idea/
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+tmp/
+temp/
+*.tmp
+*.log
