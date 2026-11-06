@@ -1,0 +1,280 @@
+/* Dose history table and responsive presentation. */
+/* Dose history */
+.mt-dose-history-panel .mt-panel__header {
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.mt-dose-history-panel .mt-panel__header > :last-child {
+  min-width: 0;
+  margin-left: auto;
+}
+
+.mt-dose-history-toolbar {
+  display: grid;
+  grid-template-columns: minmax(190px, 300px) 88px;
+  gap: 8px;
+  align-items: end;
+}
+
+.mt-dose-history-control {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mt-dose-history-control .mt-select {
+  min-width: 0;
+  min-height: 32px;
+  font-size: 0.82rem;
+}
+
+.mt-dose-history-table {
+  min-width: 0;
+}
+
+.mt-dose-history-table .mt-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+
+.mt-dose-history-table .mt-table {
+  min-width: 790px;
+  table-layout: fixed;
+}
+
+.mt-dose-history-table .mt-table th,
+.mt-dose-history-table .mt-table td {
+  padding-inline: 9px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(1),
+.mt-dose-history-table .mt-table td:nth-child(1) {
+  width: 104px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(2),
+.mt-dose-history-table .mt-table td:nth-child(2) {
+  width: 70px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(3),
+.mt-dose-history-table .mt-table td:nth-child(3) {
+  width: 150px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(4),
+.mt-dose-history-table .mt-table td:nth-child(4) {
+  width: 116px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(5),
+.mt-dose-history-table .mt-table td:nth-child(5) {
+  width: 96px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(6),
+.mt-dose-history-table .mt-table td:nth-child(6) {
+  width: 168px;
+  min-width: 168px;
+}
+
+.mt-dose-history-table .mt-table th:nth-child(7),
+.mt-dose-history-table .mt-table td:nth-child(7) {
+  width: 126px;
+}
+
+.mt-dose-history-date,
+.mt-dose-history-time,
+.mt-dose-history-lot,
+.mt-dose-history-amount,
+.mt-dose-history-product {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-dose-history-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.mt-dose-history-actions .mt-button {
+  min-height: 30px;
+  padding-inline: 9px;
+  font-size: 0.78rem;
+}
+
+.mt-dose-history-table .mt-table tr.is-selected td {
+  background: var(--mt-accent-bg);
+  box-shadow: none;
+}
+
+.mt-table tr.mt-dose-history-row--new-day td {
+  border-top: 2px solid color-mix(in srgb, var(--mt-border) 72%, var(--mt-text) 28%);
+}
+
+.mt-table tr.mt-dose-history-row--new-day:hover td,
+.mt-table tr.mt-dose-history-row--new-day.is-selected td {
+  border-top-color: color-mix(in srgb, var(--mt-accent) 58%, var(--mt-text) 42%);
+}
+
+/* Form controls respond to the form panel width rather than viewport width. */
+@container (max-width: 430px) {
+  .mt-dose-picker__header,
+  .mt-dose-amount-panel--whole,
+  .mt-dose-mass-row,
+  .mt-dose-lot-inline,
+  .mt-dose-date-time-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mt-dose-amount-panel--split {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mt-dose-split-slider,
+  .mt-dose-amount-panel--split .mt-dose-selected {
+    grid-column: 1 / -1;
+  }
+
+  .mt-dose-inline-preview {
+    text-align: right;
+  }
+}
+
+@container (max-width: 330px) {
+  .mt-dose-amount-panel--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mt-dose-amount-panel--split .mt-dose-compact-field:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* History toolbar and table become compact cards when the history panel is narrow. */
+@container (max-width: 620px) {
+  .mt-dose-history-panel .mt-panel__header > :last-child {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .mt-dose-history-toolbar {
+    grid-template-columns: minmax(0, 1fr) 88px;
+    width: 100%;
+  }
+
+  .mt-dose-history-table .mt-table-wrap {
+    overflow: visible;
+    border: 0;
+  }
+
+  .mt-dose-history-table .mt-table,
+  .mt-dose-history-table .mt-table tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mt-dose-history-table .mt-table thead {
+    display: none;
+  }
+
+  .mt-dose-history-table .mt-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+    margin-bottom: 8px;
+    padding: 12px;
+    border: var(--mt-border-size) solid var(--mt-border);
+    background: var(--mt-bg-input);
+  }
+
+  .mt-dose-history-table .mt-table tr:hover,
+  .mt-dose-history-table .mt-table tr.is-selected {
+    border-color: var(--mt-accent);
+    background: var(--mt-accent-bg);
+  }
+
+  .mt-dose-history-table .mt-table tr.mt-dose-history-row--new-day {
+    margin-top: 14px;
+    border-top: 2px solid color-mix(in srgb, var(--mt-border) 72%, var(--mt-text) 28%);
+  }
+
+  .mt-dose-history-table .mt-table td,
+  .mt-dose-history-table .mt-table tr:hover td,
+  .mt-dose-history-table .mt-table tr.is-selected td,
+  .mt-dose-history-table .mt-table tr.mt-dose-history-row--new-day td {
+    display: grid;
+    gap: 3px;
+    width: auto;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .mt-dose-history-table .mt-table td::before {
+    content: attr(data-label);
+    color: var(--mt-text-dim);
+    font-family: var(--mt-font-sans);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .mt-dose-history-table .mt-table td[colspan] {
+    grid-column: 1 / -1;
+  }
+
+  .mt-dose-history-table .mt-table td[colspan]::before {
+    display: none;
+  }
+
+  .mt-dose-history-product,
+  .mt-dose-history-actions-cell {
+    grid-column: 1 / -1;
+  }
+
+  .mt-dose-history-product,
+  .mt-dose-history-lot {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .mt-dose-history-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mt-dose-history-actions .mt-button {
+    width: 100%;
+  }
+
+  .mt-table-pagination {
+    align-items: stretch;
+  }
+
+  .mt-table-pagination__actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@container (max-width: 420px) {
+  .mt-dose-history-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .mt-dose-history-control--compact {
+    width: 100%;
+  }
+}
+

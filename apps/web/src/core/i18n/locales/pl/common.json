@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "DoseArk",
+    "channel": "dev"
+  },
+  "actions": {
+    "new": "Nowy",
+    "reload": "Odśwież",
+    "save": "Zapisz",
+    "create": "Dodaj",
+    "update": "Aktualizuj",
+    "close": "Zamknij",
+    "clear": "Wyczyść"
+  },
+  "nav": {
+    "products": "Produkty",
+    "brands": "Marki",
+    "nutrients": "Składniki",
+    "inventory": "Magazyn",
+    "dosing": "Dawkowanie",
+    "settings": "Ustawienia",
+    "statistics": "Statystyki"
+  },
+  "debug": {
+    "console": "Konsola",
+    "enabled": "DEBUG: ON",
+    "disabled": "DEBUG: OFF"
+  }
+}

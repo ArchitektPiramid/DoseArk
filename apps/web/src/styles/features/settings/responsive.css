@@ -1,0 +1,133 @@
+/* Settings responsiveness and profile card density. */
+/* Responsive */
+@media (max-width: 1250px) {
+  .mt-settings-grid,
+  .mt-settings-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mt-settings-core-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mt-settings-core-meta > span:nth-child(3n) { border-right: 0; }
+}
+
+@media (max-width: 1050px) {
+  .mt-profile-manager { grid-template-columns: 1fr; }
+  .mt-profile-list__items { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .mt-settings-grid,
+  .mt-settings-status-grid,
+  .mt-settings-grid--general { grid-template-columns: 1fr; }
+  .mt-settings-core-meta { grid-template-columns: 1fr; }
+  .mt-settings-core-meta > span { border-right: 0; border-bottom: var(--mt-border-size) solid var(--mt-border-soft); }
+  .mt-settings-core-meta > span:last-child { border-bottom: 0; }
+  .mt-settings-panel--wide { grid-column: auto; }
+  .mt-profile-list__items { grid-template-columns: 1fr; }
+  .mt-profile-detail-tab { min-width: 0; flex: 1 1 150px; }
+  .mt-profile-editor__overview,
+  .mt-profile-detail-tabs,
+  .mt-profile-runtime-vars,
+  .mt-profile-runtime-source,
+  .mt-profile-source-list > div,
+  .mt-settings-env-vars__header,
+  .mt-settings-env-var { grid-template-columns: 1fr; gap: 2px; }
+}
+
+@media (max-width: 640px) {
+  .mt-settings-form-grid,
+  .mt-settings-detail-row { grid-template-columns: 1fr; }
+  .mt-settings-detail-row dd { text-align: left; }
+}
+
+/* Profile manager density: keep both columns content-sized and make preview cards informative. */
+.mt-profile-list__items {
+  gap: 7px;
+}
+
+.mt-profile-card {
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  padding: 9px 10px;
+}
+
+.mt-profile-card__icon {
+  width: 24px;
+  height: 24px;
+  align-self: start;
+}
+
+.mt-profile-card__content {
+  gap: 5px;
+}
+
+.mt-profile-card__name {
+  align-items: center;
+  gap: 10px;
+}
+
+.mt-profile-card__summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mt-profile-card__description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.mt-profile-card__facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px 10px;
+  margin-top: 1px;
+  padding-top: 5px;
+  border-top: var(--mt-border-size) solid var(--mt-border-soft);
+}
+
+.mt-profile-card__fact {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.mt-profile-card__fact[data-wide="true"] {
+  grid-column: auto;
+}
+
+.mt-profile-card__fact small {
+  color: var(--mt-text-dim);
+  font-size: .54rem;
+  font-weight: 650;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.mt-profile-card__fact code {
+  display: block;
+  overflow: hidden;
+  color: var(--mt-text-muted);
+  font-family: var(--mt-font-mono);
+  font-size: .59rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .mt-profile-manager {
+    grid-template-columns: minmax(360px, .88fr) minmax(0, 1.12fr);
+  }
+
+  .mt-profile-card__facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+@media (max-width: 1050px) {
+  .mt-profile-manager {
+    grid-template-columns: 1fr;
+  }
+}
+

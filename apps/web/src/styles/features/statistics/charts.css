@@ -1,0 +1,57 @@
+/* Shared statistics chart layout and card sizing. */
+.mt-statistics-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mt-space-3);
+  min-width: 0;
+}
+
+.mt-statistics-chart-card {
+  min-width: 0;
+}
+
+.mt-statistics-chart-card--wide {
+  grid-column: 1 / -1;
+}
+
+.mt-statistics-chart-card .mt-panel__body {
+  padding: 8px 10px 10px;
+}
+
+.mt-statistics-chart-description {
+  margin: 0 0 6px;
+  color: var(--mt-text-dim);
+  font-size: 0.72rem;
+}
+
+.mt-statistics-chart {
+  width: 100%;
+  min-height: 300px;
+}
+
+.mt-statistics-chart--daily {
+  min-height: 360px;
+}
+
+.mt-statistics-chart canvas {
+  outline: none;
+}
+
+.mt-statistics-chart-empty {
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  color: var(--mt-text-dim);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 1100px) {
+  .mt-statistics-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .mt-statistics-chart-card--wide {
+    grid-column: auto;
+  }
+}
+

@@ -1,0 +1,6 @@
+/* Compact remaining/initial inventory display. */
+/* Compact historical stock value: remaining / initial (used). */
+.mt-dose-history-stock__content {
+  min-width: 0;
+  justify-items: start;
+}

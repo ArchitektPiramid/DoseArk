@@ -1,0 +1,178 @@
+/* Custom calendar and 5-minute time picker. */
+/* In-app calendar and deterministic 5-minute time picker. */
+.mt-dose-calendar-trigger {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  min-height: var(--mt-control-height);
+  padding: 0 10px 0 4px;
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-input);
+  color: var(--mt-text-strong);
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--mt-font-mono);
+  text-align: left;
+}
+
+.mt-dose-calendar-trigger > svg {
+  justify-self: center;
+  color: var(--mt-accent-strong);
+}
+
+.mt-dose-calendar-trigger:hover,
+.mt-dose-calendar-trigger.is-open {
+  border-color: var(--mt-accent-strong);
+  background: var(--mt-bg-panel-soft);
+}
+
+.mt-dose-calendar {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  left: 0;
+  width: min(300px, calc(100vw - 32px));
+  padding: 10px;
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-panel);
+  box-shadow: 0 16px 42px rgb(0 0 0 / 42%);
+}
+
+.mt-dose-calendar__header {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mt-dose-calendar__header strong {
+  overflow: hidden;
+  color: var(--mt-text-strong);
+  font-size: 0.8rem;
+  text-align: center;
+  text-transform: capitalize;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-dose-calendar__nav {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+  color: var(--mt-text-muted);
+  cursor: pointer;
+}
+
+.mt-dose-calendar__nav:hover {
+  color: var(--mt-text-strong);
+  border-color: var(--mt-accent-strong);
+}
+
+.mt-dose-calendar__weekdays,
+.mt-dose-calendar__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.mt-dose-calendar__weekdays {
+  margin-bottom: 4px;
+  color: var(--mt-text-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.mt-dose-calendar__weekdays span {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mt-dose-calendar__day,
+.mt-dose-calendar__empty {
+  aspect-ratio: 1;
+}
+
+.mt-dose-calendar__day {
+  min-width: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--mt-text);
+  cursor: pointer;
+  font-family: var(--mt-font-mono);
+  font-size: 0.72rem;
+}
+
+.mt-dose-calendar__day:hover {
+  border-color: var(--mt-accent-strong);
+  background: var(--mt-bg-panel-soft);
+}
+
+.mt-dose-calendar__day.is-today {
+  border-color: var(--mt-border);
+  color: var(--mt-accent-strong);
+}
+
+.mt-dose-calendar__day.is-selected {
+  border-color: var(--mt-accent-strong);
+  background: var(--mt-accent-muted);
+  color: var(--mt-text-strong);
+  font-weight: 750;
+}
+
+.mt-dose-calendar__today {
+  width: 100%;
+  min-height: 30px;
+  margin-top: 8px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+  color: var(--mt-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+}
+
+.mt-dose-calendar__today:hover {
+  border-color: var(--mt-accent-strong);
+  background: var(--mt-bg-panel-soft);
+}
+
+.mt-dose-clock-picker {
+  display: grid;
+  grid-template-columns: minmax(72px, 1fr) 14px minmax(72px, 1fr);
+  gap: 4px;
+  align-items: center;
+}
+
+.mt-dose-clock-picker .mt-select {
+  min-width: 0;
+  height: var(--mt-control-height);
+  padding-inline: 10px;
+  font-family: var(--mt-font-mono);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.mt-dose-clock-picker__separator {
+  color: var(--mt-text-strong);
+  font-family: var(--mt-font-mono);
+  font-size: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .mt-dose-toast {
+    top: 10px;
+    right: 10px;
+    width: calc(100vw - 20px);
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "page": {
+    "title": "Inventory",
+    "description": "Manage purchased packages/lots and remaining stock."
+  },
+  "stockMovements": {
+    "title": "Stock movements",
+    "empty": "No stock movements yet.",
+    "movementType": "Type",
+    "quantityDelta": "Delta",
+    "quantityAfter": "After",
+    "occurredAt": "Occurred at",
+    "reason": "Reason"
+  }
+}

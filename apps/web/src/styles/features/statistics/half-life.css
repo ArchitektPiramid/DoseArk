@@ -1,0 +1,186 @@
+/* Half-life chart, legends and responsive controls. */
+/* Half-life chart */
+.mt-statistics-half-life-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 9px;
+}
+
+.mt-statistics-half-life-control {
+  display: grid;
+  gap: 4px;
+  color: var(--mt-text-muted);
+  font-size: 0.68rem;
+}
+
+.mt-statistics-half-life-control__input {
+  display: flex;
+  align-items: center;
+  min-height: var(--mt-control-height);
+  border: var(--mt-border-size) solid var(--mt-border);
+  border-radius: var(--mt-radius-sm);
+  background: var(--mt-bg-panel);
+}
+
+.mt-statistics-half-life-control__input input {
+  width: 54px;
+  min-height: calc(var(--mt-control-height) - 2px);
+  padding: 5px 8px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--mt-text-strong);
+}
+
+.mt-statistics-half-life-control__input em {
+  padding: 0 6px 0 2px;
+  color: var(--mt-text-dim);
+  font-size: 0.68rem;
+  font-style: normal;
+}
+
+.mt-statistics-half-life-wrap {
+  width: 100%;
+  overflow-x: auto;
+  padding-top: var(--mt-space-1);
+}
+
+.mt-statistics-half-life {
+  display: block;
+  width: 100%;
+  min-width: 900px;
+  height: 430px;
+}
+
+.mt-statistics-half-life text {
+  fill: var(--mt-text-dim);
+  font-size: 10px;
+}
+
+.mt-statistics-half-life__grid {
+  stroke: color-mix(in srgb, var(--mt-border) 62%, transparent);
+  stroke-width: 1;
+}
+
+.mt-statistics-half-life__legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  min-height: 28px;
+  color: var(--mt-text-muted);
+  font-size: 0.68rem;
+}
+
+.mt-statistics-half-life__legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mt-statistics-half-life__legend i {
+  display: inline-block;
+  width: 24px;
+}
+
+.mt-statistics-half-life__legend-bar {
+  height: 9px;
+  background: #e86b63;
+  opacity: 0.58;
+}
+
+.mt-statistics-half-life__legend-line {
+  height: 0;
+  border-top: 2px solid #4da3ff;
+}
+
+.mt-statistics-half-life__legend-average {
+  height: 0;
+  border-top: 2px dashed #f0a23a;
+}
+
+.mt-statistics-half-life__bar {
+  fill: #e86b63;
+  fill-opacity: 0.54;
+  stroke: none;
+  shape-rendering: crispEdges;
+  cursor: help;
+}
+
+.mt-statistics-half-life__line {
+  fill: none;
+  stroke: #4da3ff;
+  stroke-width: 2.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.mt-statistics-half-life__average {
+  fill: none;
+  stroke: #f0a23a;
+  stroke-width: 2;
+  stroke-dasharray: 7 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.mt-statistics-half-life__grid--vertical {
+  opacity: 0.55;
+}
+
+.mt-statistics-half-life__axis-right {
+  fill: #e86b63 !important;
+}
+
+.mt-statistics-half-life__axis-left {
+  fill: #6db4ff !important;
+}
+
+.mt-statistics-half-life__axis-title {
+  font-size: 9px !important;
+}
+
+.mt-statistics-half-life-series-toggles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--mt-control-height);
+  padding-bottom: 1px;
+}
+
+.mt-statistics-half-life-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mt-text-muted);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mt-statistics-half-life-toggle input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--mt-accent);
+}
+
+@media (max-width: 760px) {
+  .mt-statistics-half-life-controls {
+    justify-content: stretch;
+  }
+
+  .mt-statistics-half-life-control {
+    flex: 1 1 120px;
+  }
+
+  .mt-statistics-half-life-series-toggles {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .mt-statistics-half-life-control__input input {
+    width: 50px;
+  }
+}
+

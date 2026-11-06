@@ -1,0 +1,308 @@
+
+
+.mt-inventory-location-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mt-inventory-location-chip__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-input);
+  color: var(--mt-accent-strong);
+}
+
+.mt-inventory-location-chip__label,
+.mt-inventory-product-cell__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mt-inventory-lots-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mt-space-3);
+  min-width: 0;
+}
+
+.mt-inventory-product-cell {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: var(--mt-space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.mt-inventory-stock-alert {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.mt-inventory-stock-alert--placeholder {
+  visibility: hidden;
+}
+
+.mt-inventory-stock-alert--warning {
+  color: var(--mt-warning);
+  background: var(--mt-warning-bg);
+}
+
+.mt-inventory-stock-alert--danger {
+  color: var(--mt-danger);
+  background: var(--mt-danger-bg);
+}
+
+.mt-inventory-lots-table {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+/* Keep metadata columns compact and let product names use remaining width. */
+.mt-inventory-lots-table .mt-table {
+  min-width: 680px;
+  table-layout: auto;
+}
+
+.mt-inventory-lots-table .mt-table th,
+.mt-inventory-lots-table .mt-table td {
+  padding: 7px 8px;
+}
+
+.mt-inventory-lots-table .mt-table th:not(:first-child),
+.mt-inventory-lots-table .mt-table td:not(:first-child) {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.mt-inventory-lots-table .mt-table th:first-child,
+.mt-inventory-lots-table .mt-table td:first-child {
+  min-width: 170px;
+}
+
+.mt-inventory-lots-table .mt-table th:nth-child(3),
+.mt-inventory-lots-table .mt-table td:nth-child(3) {
+  min-width: 116px;
+  text-align: center;
+}
+
+.mt-inventory-lots-table .mt-table th:nth-child(5),
+.mt-inventory-lots-table .mt-table td:nth-child(5) {
+  min-width: 85px;
+  text-align: center;
+}
+
+.mt-inventory-lots-table__expires {
+  white-space: nowrap;
+}
+
+.mt-inventory-lots-table__lot {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mt-inventory-lots-table__storage {
+  max-width: 150px;
+}
+
+.mt-inventory-form-grid--identity,
+.mt-inventory-form-grid--stock {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mt-inventory-form-grid--dates {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mt-inventory-form-notes {
+  min-height: 86px;
+}
+
+.mt-inventory-stock-preview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-border);
+}
+
+.mt-inventory-stock-preview__item {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px 10px;
+  background: var(--mt-bg-input);
+}
+
+.mt-inventory-stock-preview__item span {
+  color: var(--mt-text-muted);
+  font-size: 0.66rem;
+}
+
+.mt-inventory-stock-preview__item strong {
+  overflow: hidden;
+  color: var(--mt-text-strong);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mt-inventory-storage-option {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: var(--mt-space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.mt-inventory-storage-option__icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-input);
+  color: var(--mt-accent-strong);
+}
+
+.mt-inventory-storage-option__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mt-inventory-storage-option__title {
+  overflow: hidden;
+  color: var(--mt-text-strong);
+  font-size: 0.9rem;
+  font-weight: 650;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-inventory-storage-option__meta {
+  color: var(--mt-text-muted);
+  font-size: 0.68rem;
+}
+
+@container (max-width: 590px) {
+  .mt-inventory-form-grid--dates,
+  .mt-inventory-stock-preview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 440px) {
+  .mt-inventory-form-grid--identity,
+  .mt-inventory-form-grid--stock,
+  .mt-inventory-form-grid--dates,
+  .mt-inventory-stock-preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Inline master-detail workspace, matching the Products page. */
+.mt-inventory-workspace {
+  grid-template-columns: minmax(380px, 0.9fr) minmax(0, 1.8fr);
+  align-items: start;
+}
+
+.mt-inventory-workspace > .mt-panel {
+  min-width: 0;
+}
+
+.mt-inventory-editor .mt-panel__body {
+  min-width: 0;
+}
+
+.mt-inventory-editor__tabs {
+  margin-bottom: 10px;
+}
+
+.mt-inventory-editor .mt-form {
+  gap: 8px;
+}
+
+.mt-inventory-editor .mt-form-section {
+  gap: 8px;
+  padding: 10px;
+}
+
+.mt-inventory-editor .mt-form-grid {
+  gap: 8px;
+}
+
+.mt-inventory-editor .mt-inventory-form-grid--identity,
+.mt-inventory-editor .mt-inventory-form-grid--stock,
+.mt-inventory-editor .mt-inventory-form-grid--dates {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mt-inventory-editor .mt-inventory-form-notes {
+  min-height: 68px;
+}
+
+.mt-inventory-editor .mt-inventory-stock-preview {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mt-inventory-editor .mt-inventory-stock-preview__item {
+  padding: 7px 8px;
+}
+
+.mt-inventory-editor .mt-form-actions {
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--mt-border-soft);
+}
+
+/* Embedded info/movement panels should not create a second panel frame. */
+.mt-inventory-editor > .mt-panel__body > .mt-panel {
+  border: 0;
+  background: transparent;
+}
+
+.mt-inventory-editor > .mt-panel__body > .mt-panel > .mt-panel__header {
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 7px 0;
+}
+
+.mt-inventory-editor > .mt-panel__body > .mt-panel > .mt-panel__body {
+  min-width: 0;
+  padding: 10px 0 0;
+  overflow-x: auto;
+}
+
+.mt-inventory-list-panel .mt-panel__header {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 1240px) {
+  .mt-inventory-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .mt-inventory-editor .mt-inventory-form-grid--identity,
+  .mt-inventory-editor .mt-inventory-form-grid--stock,
+  .mt-inventory-editor .mt-inventory-form-grid--dates {
+    grid-template-columns: 1fr;
+  }
+}

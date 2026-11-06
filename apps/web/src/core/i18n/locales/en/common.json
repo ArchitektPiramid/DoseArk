@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "DoseArk",
+    "channel": "dev"
+  },
+  "actions": {
+    "new": "New",
+    "reload": "Reload",
+    "save": "Save",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "clear": "Clear"
+  },
+  "nav": {
+    "products": "Products",
+    "brands": "Brands",
+    "nutrients": "Nutrients",
+    "inventory": "Inventory",
+    "dosing": "Dosing",
+    "settings": "Settings",
+    "statistics": "Statistics"
+  },
+  "debug": {
+    "console": "Console",
+    "enabled": "DEBUG: ON",
+    "disabled": "DEBUG: OFF"
+  }
+}

@@ -1,0 +1,252 @@
+/* Dose entry fields, quantity picker and date inputs. */
+.mt-dose-history-panel {
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.mt-dose-form-content {
+  display: grid;
+  gap: 12px;
+}
+
+.mt-dose-form-content > .mt-field {
+  gap: 4px;
+}
+
+.mt-dose-notes {
+  min-height: 68px;
+  resize: vertical;
+}
+
+.mt-dose-section,
+.mt-dose-picker {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.mt-dose-picker__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.mt-dose-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-input);
+}
+
+.mt-dose-mode {
+  min-width: 0;
+  min-height: 34px;
+  border: 0;
+  border-right: var(--mt-border-size) solid var(--mt-border);
+  background: transparent;
+  color: var(--mt-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.mt-dose-mode:last-child {
+  border-right: 0;
+}
+
+.mt-dose-mode:hover {
+  background: var(--mt-bg-panel-soft);
+}
+
+.mt-dose-mode.is-active {
+  background: var(--mt-accent-muted);
+  color: var(--mt-text-strong);
+}
+
+.mt-dose-inline-preview {
+  color: var(--mt-text-muted);
+  font-family: var(--mt-font-mono);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.mt-dose-amount-panel {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-dose-amount-panel--whole {
+  grid-template-columns: 100px minmax(0, 1fr);
+  align-items: end;
+}
+
+.mt-dose-amount-panel--split {
+  grid-template-columns: 82px 88px 94px minmax(80px, 1fr);
+  align-items: end;
+}
+
+.mt-dose-compact-field {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mt-dose-compact-field .mt-input,
+.mt-dose-compact-field .mt-select {
+  min-width: 0;
+  height: 32px;
+  padding-inline: 8px;
+  font-family: var(--mt-font-mono);
+  font-size: 0.82rem;
+}
+
+.mt-dose-split-slider {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+}
+
+.mt-dose-range {
+  min-width: 0;
+  width: 100%;
+  accent-color: var(--mt-accent-strong);
+}
+
+.mt-dose-selected {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 7px;
+  align-items: baseline;
+  color: var(--mt-text-strong);
+  font-family: var(--mt-font-mono);
+  font-size: 0.78rem;
+}
+
+.mt-dose-amount-panel--split .mt-dose-selected {
+  grid-column: 1 / -1;
+  padding-top: 7px;
+  border-top: var(--mt-border-size) solid var(--mt-border-soft);
+}
+
+.mt-dose-selected__label,
+.mt-dose-selected__meta {
+  color: var(--mt-text-muted);
+  font-size: 0.7rem;
+}
+
+.mt-dose-selected__meta {
+  overflow: hidden;
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-dose-mass-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 44%);
+  gap: 10px;
+  align-items: center;
+  padding: 8px 9px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-dose-mass-row__heading {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.mt-dose-mass-row__hint {
+  overflow: hidden;
+  color: var(--mt-text-muted);
+  font-family: var(--mt-font-mono);
+  font-size: 0.68rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-dose-mass-row__control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 26px;
+  gap: 6px;
+  align-items: center;
+}
+
+.mt-dose-mass-row__control .mt-input {
+  height: 32px;
+  font-family: var(--mt-font-mono);
+  font-size: 0.82rem;
+}
+
+.mt-dose-mass-row__unit {
+  color: var(--mt-text-muted);
+  font-family: var(--mt-font-mono);
+  font-size: 0.72rem;
+}
+
+.mt-dose-lot-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(92px, 0.72fr) minmax(86px, 0.72fr);
+  gap: 6px;
+  padding: 7px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-dose-lot-inline__item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.mt-dose-lot-inline__icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: var(--mt-border-size) solid var(--mt-border);
+  color: var(--mt-accent-strong);
+  background: var(--mt-bg-input);
+}
+
+.mt-dose-lot-inline__label {
+  color: var(--mt-text-muted);
+  font-size: 0.64rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.mt-dose-lot-inline__value {
+  overflow: hidden;
+  color: var(--mt-text-strong);
+  font-family: var(--mt-font-mono);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mt-dose-date-time-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(150px, 0.65fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mt-dose-date-time-field {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+

@@ -1,0 +1,291 @@
+/* Shared overlays, drawers and developer console. */
+
+.mt-drawer-layer {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mt-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: rgb(2 7 13 / 66%);
+  cursor: default;
+  pointer-events: auto;
+  animation: mt-drawer-backdrop-in 150ms ease-out;
+}
+
+.mt-drawer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: min(680px, calc(100vw - 24px));
+  height: 100dvh;
+  flex-direction: column;
+  border-right: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-panel);
+  box-shadow: 18px 0 48px rgb(0 0 0 / 38%);
+  pointer-events: auto;
+  animation: mt-drawer-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mt-drawer--compact {
+  width: min(520px, calc(100vw - 24px));
+}
+
+.mt-drawer__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--mt-space-4);
+  align-items: start;
+  padding: var(--mt-space-5) var(--mt-space-5) var(--mt-space-4);
+  border-bottom: var(--mt-border-size) solid var(--mt-border);
+}
+
+.mt-drawer__heading {
+  min-width: 0;
+}
+
+.mt-drawer__title {
+  margin: 0;
+  color: var(--mt-text-strong);
+  font-size: 1.08rem;
+  font-weight: 750;
+}
+
+.mt-drawer__description {
+  max-width: 560px;
+  margin: 5px 0 0;
+  color: var(--mt-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.mt-drawer__close {
+  display: grid;
+  place-items: center;
+  width: var(--mt-control-height);
+  min-width: var(--mt-control-height);
+  height: var(--mt-control-height);
+  padding: 0;
+}
+
+.mt-drawer__tabs {
+  padding: var(--mt-space-3) var(--mt-space-5);
+  border-bottom: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-drawer__body {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--mt-space-4) var(--mt-space-5) var(--mt-space-5);
+  container-type: inline-size;
+}
+
+.mt-drawer__body > .mt-panel {
+  min-width: 0;
+}
+
+.mt-drawer__error {
+  margin-bottom: var(--mt-space-3);
+  padding: 9px 10px;
+  border: var(--mt-border-size) solid var(--mt-danger);
+  border-radius: var(--mt-radius-sm);
+  background: var(--mt-danger-bg);
+  color: var(--mt-danger);
+  font-family: var(--mt-font-mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+@keyframes mt-drawer-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mt-drawer-in {
+  from { transform: translateX(-24px); opacity: 0.9; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 720px) {
+  .mt-drawer,
+  .mt-drawer--compact {
+    width: 100vw;
+    border-right: 0;
+  }
+
+  .mt-drawer__header,
+  .mt-drawer__tabs {
+    padding-inline: var(--mt-space-4);
+  }
+
+  .mt-drawer__body {
+    padding: var(--mt-space-4);
+  }
+
+  .mt-form-actions--sticky {
+    bottom: calc(-1 * var(--mt-space-4));
+    margin: var(--mt-space-2) calc(-1 * var(--mt-space-4)) calc(-1 * var(--mt-space-4));
+    padding: var(--mt-space-3) var(--mt-space-4) var(--mt-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mt-drawer,
+  .mt-drawer-backdrop {
+    animation: none;
+  }
+}
+
+.mt-dev-console-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+}
+
+.mt-dev-console {
+  position: fixed;
+  right: 16px;
+  bottom: 64px;
+  z-index: 59;
+  display: flex;
+  width: min(960px, calc(100vw - 32px));
+  max-height: min(620px, calc(100vh - 96px));
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--mt-border-size) solid var(--mt-border-strong);
+  background: var(--mt-bg-shell);
+  box-shadow: 0 14px 48px rgb(0 0 0 / 45%);
+  font-family: var(--mt-font-mono);
+}
+
+.mt-dev-console__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-bottom: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-dev-console__title {
+  color: var(--mt-text-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mt-dev-console__meta {
+  margin-top: 2px;
+  color: var(--mt-text-dim);
+  font-size: 11px;
+}
+
+.mt-dev-console__body {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.mt-dev-console__empty {
+  padding: 16px;
+  color: var(--mt-text-muted);
+}
+
+.mt-dev-console__event {
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+}
+
+.mt-dev-console__row {
+  display: grid;
+  grid-template-columns: 52px 82px 68px 86px minmax(220px, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  padding: 7px 10px;
+  color: var(--mt-text);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.mt-dev-console__event > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.mt-dev-console__event > summary::-webkit-details-marker {
+  display: none;
+}
+
+.mt-dev-console__event[open] > summary,
+.mt-dev-console__event > summary:hover {
+  background: var(--mt-bg-panel-soft);
+}
+
+.mt-dev-console__sequence,
+.mt-dev-console__source {
+  color: var(--mt-text-dim);
+}
+
+.mt-dev-console__message {
+  overflow-wrap: anywhere;
+}
+
+.mt-dev-console__level {
+  font-weight: 700;
+}
+
+.mt-dev-console__level--trace,
+.mt-dev-console__level--debug {
+  color: var(--mt-text-muted);
+}
+
+.mt-dev-console__level--info {
+  color: var(--mt-accent-strong);
+}
+
+.mt-dev-console__level--success {
+  color: var(--mt-success);
+}
+
+.mt-dev-console__level--warn {
+  color: var(--mt-warning);
+}
+
+.mt-dev-console__level--error {
+  color: var(--mt-danger);
+}
+
+.mt-dev-console__details {
+  margin: 0;
+  padding: 10px 12px 12px 238px;
+  overflow: auto;
+  border-top: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+  color: var(--mt-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .mt-dev-console__row {
+    grid-template-columns: 44px 72px 64px minmax(72px, auto) minmax(160px, 1fr);
+  }
+
+  .mt-dev-console__details {
+    padding-left: 12px;
+  }
+}

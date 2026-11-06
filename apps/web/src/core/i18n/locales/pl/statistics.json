@@ -1,0 +1,168 @@
+{
+  "page": {
+    "title": "Statystyki"
+  },
+  "subject": {
+    "source": "Źródło danych",
+    "product": "Produkt",
+    "nutrient": "Składnik",
+    "noProducts": "Brak produktów",
+    "noNutrients": "Brak składników w tym zakresie"
+  },
+  "range": {
+    "quick": "Szybki zakres",
+    "from": "Od",
+    "to": "Do",
+    "apply": "Pokaż",
+    "invalid": "Wybierz poprawny zakres",
+    "tooLong": "Maksymalny zakres to 2 lata",
+    "days": "{{count}} dni",
+    "presets": {
+      "30": "30 dni",
+      "90": "90 dni",
+      "180": "6 mies.",
+      "365": "1 rok",
+      "730": "2 lata"
+    },
+    "shift": "Przesuń zakres czasu",
+    "shiftBack": "Przesuń zakres o {{count}} dni wstecz",
+    "shiftForward": "Przesuń zakres o {{count}} dni do przodu"
+  },
+  "actions": {
+    "refresh": "Odśwież"
+  },
+  "summary": {
+    "entries": "Wpisy",
+    "total": "Suma",
+    "doses": "Dawki",
+    "recordedDays": "Dni z wpisami",
+    "averageRecordedDay": "Śr. / dzień z wpisami"
+  },
+  "charts": {
+    "daily": {
+      "title": "Suma dzienna",
+      "description": "Wartości dzień po dniu w wybranym zakresie. Długie zakresy można przybliżać.",
+      "series": "Suma dzienna"
+    },
+    "monthly": {
+      "title": "Suma miesięczna",
+      "description": "Kompaktowy podgląd miesięczny dla dłuższych zakresów.",
+      "series": "Suma miesięczna"
+    },
+    "hourly": {
+      "title": "Rozkład godzin dawkowania",
+      "description": "Liczba zapisanych dawek przypadających na każdą godzinę doby.",
+      "series": "Dawki"
+    }
+  },
+  "state": {
+    "loading": "Ładowanie statystyk…",
+    "ready": "",
+    "empty": "Brak zapisanych danych w tym zakresie.",
+    "noChartData": "Brak danych do wykresu."
+  },
+  "view": {
+    "label": "Widok statystyk",
+    "charts": "Wykresy",
+    "heatmap": "Rok / dni",
+    "halfLife": "Okres półtrwania",
+    "rollingAverage": "Średnia krocząca",
+    "comparison": "Porównanie"
+  },
+  "heatmap": {
+    "title": "Roczna mapa dni",
+    "description": "Każdy kwadrat to jeden dzień. Większa suma dzienna przechodzi od zieleni przez pomarańczowy do czerwieni. Skala dopasowuje się do wybranego produktu lub składnika.",
+    "year": "Rok",
+    "gridLabel": "Sumy dzienne dla roku {{year}}",
+    "tooltip": "{{date}} · {{amount}} {{unit}} · {{count}} dawek",
+    "tooltipEmpty": "{{date}} · brak zapisanej dawki",
+    "legend": {
+      "label": "Intensywność mapy",
+      "less": "Mniej",
+      "more": "Więcej"
+    },
+    "weekdays": {
+      "mon": "Pon",
+      "tue": "Wt",
+      "wed": "Śr",
+      "thu": "Czw",
+      "fri": "Pt",
+      "sat": "Sob",
+      "sun": "Nd"
+    },
+    "showAmount": "Suma",
+    "showDoseCount": "Liczba dawek"
+  },
+  "halfLife": {
+    "title": "Estymacja wg okresu półtrwania",
+    "input": "Okres półtrwania",
+    "hours": "h",
+    "estimatedRemaining": "szac. pozostało",
+    "chartLabel": "Szacowana pozostała ilość w czasie",
+    "movingAverage": "Średnia krocząca",
+    "days": "dni",
+    "legendDoses": "Dawki / {{hours}} h",
+    "legendRemaining": "Estymowana ilość · t½ {{hours}} h",
+    "legendAverage": "Średnia krocząca · {{days}} dni",
+    "remainingAxis": "Estymowana ilość ({{unit}})",
+    "doseAxis": "Dawka w oknie ({{unit}})",
+    "toggleDoses": "Dawki",
+    "toggleRemaining": "Pozostałość",
+    "toggleAverage": "Średnia",
+    "barWidth": "Szerokość słupka",
+    "lineWidth": "Grubość linii",
+    "pixels": "px"
+  },
+  "rollingAverage": {
+    "title": "Średnia krocząca",
+    "window": "Okno",
+    "days": "dni",
+    "daily": "Suma dzienna",
+    "average": "Średnia {{days}} dni",
+    "toggleDaily": "Dzienna",
+    "toggleAverage": "Średnia"
+  },
+  "comparison": {
+    "title": "Porównanie sum dziennych",
+    "series": "Serie",
+    "select": "Wybierz serie",
+    "selected": "Wybrano: {{count}}",
+    "clear": "Wyczyść",
+    "emptyOptions": "Brak dostępnych pozycji",
+    "emptySelection": "Wybierz co najmniej jedną serię.",
+    "unitMismatch": "Wybieraj pozycje w jednostce {{unit}}, aby zachować wspólną skalę.",
+    "color": "Kolor",
+    "rollingAverage": "Średnia",
+    "rollingAverageDays": "Dni średniej kroczącej",
+    "days": "d",
+    "loadedData": "{{series}} serii · {{points}} pkt · ~{{size}} danych"
+  },
+  "layout": {
+    "pageDescription": "Przeglądaj zapisane dawki, porównuj produkty i analizuj trendy.",
+    "subjectTitle": "1. Co analizować",
+    "subjectHint": "Wybierz produkt lub składnik",
+    "selectedProduct": "Wybrany produkt",
+    "selectedNutrient": "Wybrany składnik",
+    "periodTitle": "2. Zakres czasu",
+    "periodHint": "Wybierz zakres lub podaj własne daty",
+    "customRange": "Własne daty",
+    "previousPeriod": "Poprzedni okres",
+    "nextPeriod": "Następny okres",
+    "analysisTitle": "Rodzaj analizy",
+    "analysisHint": "Wybierz sposób przedstawienia danych.",
+    "analysisSettings": "Opcje wykresu",
+    "advancedSettings": "Opcje wykresu",
+    "summaryTitle": "Podsumowanie wybranego zakresu",
+    "emptyTitle": "Brak zapisanych dawek dla tego wyboru",
+    "emptyDescription": "Wybierz dłuższy zakres lub inny produkt albo składnik.",
+    "showLastYear": "Pokaż ostatnie 12 miesięcy",
+    "viewHints": {
+      "charts": "Dni, miesiące i godziny",
+      "comparison": "Wiele serii na wykresie",
+      "heatmap": "Aktywność w całym roku",
+      "rollingAverage": "Wygładzony trend dzienny",
+      "halfLife": "Szacowana pozostała ilość"
+    },
+    "emptyHeatmapDescription": "Brak dawek w wybranym roku. Wybierz inny rok lub produkt albo składnik."
+  }
+}

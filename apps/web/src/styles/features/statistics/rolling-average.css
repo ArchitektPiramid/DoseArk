@@ -1,0 +1,82 @@
+/* Heatmap display controls and rolling-average chart. */
+/* Year heatmap controls */
+.mt-statistics-heatmap-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px 9px;
+}
+
+.mt-statistics-heatmap-value-toggles {
+  display: flex;
+  align-items: center;
+  gap: var(--mt-space-3);
+  min-height: 34px;
+}
+
+@media (max-width: 760px) {
+  .mt-statistics-heatmap-controls {
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .mt-statistics-heatmap-value-toggles {
+    min-height: 0;
+  }
+}
+
+/* Rolling average */
+.mt-statistics-rolling-average {
+  min-width: 0;
+}
+
+.mt-statistics-rolling-average-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px 9px;
+}
+
+.mt-statistics-rolling-average__legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  min-height: 24px;
+  color: var(--mt-text-muted);
+  font-size: .68rem;
+}
+
+.mt-statistics-rolling-average__legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mt-statistics-rolling-average__legend i {
+  display: inline-block;
+  width: 24px;
+  height: 0;
+}
+
+.mt-statistics-rolling-average__legend-daily {
+  border-top: 1px solid var(--mt-text-muted);
+  opacity: .7;
+}
+
+.mt-statistics-rolling-average__legend-average {
+  border-top: 3px solid var(--mt-accent);
+}
+
+.mt-statistics-chart--rolling {
+  min-height: 390px;
+}
+
+@media (max-width: 760px) {
+  .mt-statistics-rolling-average-controls {
+    justify-content: stretch;
+  }
+}
+

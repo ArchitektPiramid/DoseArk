@@ -1,0 +1,168 @@
+{
+  "page": {
+    "title": "Statistics"
+  },
+  "subject": {
+    "source": "Data source",
+    "product": "Product",
+    "nutrient": "Nutrient",
+    "noProducts": "No products available",
+    "noNutrients": "No nutrients in this range"
+  },
+  "range": {
+    "quick": "Quick range",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "invalid": "Choose a valid range",
+    "tooLong": "Maximum range is 2 years",
+    "days": "{{count}} days",
+    "presets": {
+      "30": "30d",
+      "90": "90d",
+      "180": "6m",
+      "365": "1y",
+      "730": "2y"
+    },
+    "shift": "Move time range",
+    "shiftBack": "Move range {{count}} days back",
+    "shiftForward": "Move range {{count}} days forward"
+  },
+  "actions": {
+    "refresh": "Refresh"
+  },
+  "summary": {
+    "entries": "Entries",
+    "total": "Total",
+    "doses": "Doses",
+    "recordedDays": "Recorded days",
+    "averageRecordedDay": "Avg / recorded day"
+  },
+  "charts": {
+    "daily": {
+      "title": "Daily total",
+      "description": "Day-by-day values across the selected range. Drag or scroll to zoom long ranges.",
+      "series": "Daily total"
+    },
+    "monthly": {
+      "title": "Monthly total",
+      "description": "Compact month-level overview for longer ranges.",
+      "series": "Monthly total"
+    },
+    "hourly": {
+      "title": "Dose time distribution",
+      "description": "How many recorded doses fall into each hour of the day.",
+      "series": "Doses"
+    }
+  },
+  "state": {
+    "loading": "Loading statistics…",
+    "ready": "",
+    "empty": "No recorded data in this range.",
+    "noChartData": "No data to chart."
+  },
+  "view": {
+    "label": "Statistics view",
+    "charts": "Charts",
+    "heatmap": "Year heatmap",
+    "halfLife": "Half-life",
+    "rollingAverage": "Rolling average",
+    "comparison": "Compare"
+  },
+  "heatmap": {
+    "title": "Year heatmap",
+    "description": "Each square is one day. Higher daily totals move from green through amber to red. The scale adapts to the selected product or nutrient.",
+    "year": "Year",
+    "gridLabel": "Daily totals for {{year}}",
+    "tooltip": "{{date}} · {{amount}} {{unit}} · {{count}} doses",
+    "tooltipEmpty": "{{date}} · no recorded dose",
+    "legend": {
+      "label": "Heatmap intensity",
+      "less": "Less",
+      "more": "More"
+    },
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "showAmount": "Amount",
+    "showDoseCount": "Dose count"
+  },
+  "halfLife": {
+    "title": "Half-life estimation",
+    "input": "Half-life",
+    "hours": "h",
+    "estimatedRemaining": "estimated remaining",
+    "chartLabel": "Estimated remaining amount over time",
+    "movingAverage": "Moving average",
+    "days": "days",
+    "legendDoses": "Doses / {{hours}} h",
+    "legendRemaining": "Estimated amount · t½ {{hours}} h",
+    "legendAverage": "Moving average · {{days}} days",
+    "remainingAxis": "Estimated amount ({{unit}})",
+    "doseAxis": "Dose per window ({{unit}})",
+    "toggleDoses": "Doses",
+    "toggleRemaining": "Remaining",
+    "toggleAverage": "Average",
+    "barWidth": "Dose bar width",
+    "lineWidth": "Line width",
+    "pixels": "px"
+  },
+  "rollingAverage": {
+    "title": "Rolling average",
+    "window": "Window",
+    "days": "days",
+    "daily": "Daily total",
+    "average": "{{days}}d average",
+    "toggleDaily": "Daily",
+    "toggleAverage": "Average"
+  },
+  "comparison": {
+    "title": "Daily comparison",
+    "series": "Series",
+    "select": "Select series",
+    "selected": "{{count}} selected",
+    "clear": "Clear",
+    "emptyOptions": "No items available",
+    "emptySelection": "Select at least one series.",
+    "unitMismatch": "Select items using {{unit}} to keep one shared scale.",
+    "color": "Color",
+    "rollingAverage": "Avg",
+    "rollingAverageDays": "Rolling average days",
+    "days": "d",
+    "loadedData": "{{series}} series · {{points}} points · ~{{size}} data"
+  },
+  "layout": {
+    "pageDescription": "Review recorded doses, compare products and explore trends.",
+    "subjectTitle": "1. What to analyze",
+    "subjectHint": "Select one product or nutrient",
+    "selectedProduct": "Selected product",
+    "selectedNutrient": "Selected nutrient",
+    "periodTitle": "2. Time period",
+    "periodHint": "Choose a preset or enter specific dates",
+    "customRange": "Custom dates",
+    "previousPeriod": "Previous period",
+    "nextPeriod": "Next period",
+    "analysisTitle": "Analysis",
+    "analysisHint": "Choose how you want to see the data.",
+    "analysisSettings": "Chart options",
+    "advancedSettings": "Chart options",
+    "summaryTitle": "Summary of the selected range",
+    "emptyTitle": "No doses recorded for this selection",
+    "emptyDescription": "Try a longer date range or choose another product or nutrient.",
+    "showLastYear": "Show last 12 months",
+    "viewHints": {
+      "charts": "Daily, monthly and hourly",
+      "comparison": "Multiple series on one chart",
+      "heatmap": "Activity across the year",
+      "rollingAverage": "Smooth daily fluctuations",
+      "halfLife": "Estimated remaining amount"
+    },
+    "emptyHeatmapDescription": "No doses recorded in this year. Try another year, product or nutrient."
+  }
+}

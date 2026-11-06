@@ -1,0 +1,202 @@
+/* Shared form layouts and field spacing. */
+/* Shared form layout. Feature files should only define unique grid templates. */
+.mt-form {
+  display: grid;
+  gap: var(--mt-form-gap);
+  min-width: 0;
+}
+
+.mt-form-section {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: var(--mt-space-3);
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  border-radius: var(--mt-radius-sm);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-form-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mt-space-3);
+  min-width: 0;
+  padding-bottom: 7px;
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+}
+
+.mt-form-section__title {
+  color: var(--mt-text-strong);
+  font-size: 0.82rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+
+.mt-form-grid {
+  display: grid;
+  gap: 10px 12px;
+  min-width: 0;
+}
+
+.mt-form-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mt-form-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mt-form .mt-field,
+.mt-form-grid .mt-field {
+  min-width: 0;
+}
+
+.mt-form .mt-label,
+.mt-required-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mt-required-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mt-space-1);
+}
+
+.mt-required-label__mark {
+  flex: 0 0 auto;
+  color: var(--mt-danger);
+  font-weight: 800;
+}
+
+.mt-required-label.is-invalid {
+  color: var(--mt-warning);
+}
+
+.mt-form .mt-input[aria-invalid="true"],
+.mt-form .mt-select[aria-invalid="true"],
+.mt-form .mt-textarea[aria-invalid="true"] {
+  border-color: var(--mt-warning);
+  box-shadow: inset 3px 0 0 var(--mt-warning);
+}
+
+.mt-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--mt-space-2);
+  min-width: 0;
+  padding-top: var(--mt-space-1);
+}
+
+.mt-form-actions > .mt-button {
+  min-width: 112px;
+}
+
+.mt-form-actions--sticky {
+  position: sticky;
+  bottom: calc(-1 * var(--mt-space-5));
+  z-index: 5;
+  margin: var(--mt-space-2) calc(-1 * var(--mt-space-5)) calc(-1 * var(--mt-space-5));
+  padding: var(--mt-space-3) var(--mt-space-5) var(--mt-space-5);
+  border-top: var(--mt-border-size) solid var(--mt-border);
+  background: var(--mt-bg-panel);
+}
+
+@container (max-width: 540px) {
+  .mt-form-section__header {
+    display: grid;
+    gap: 3px;
+  }
+
+
+  .mt-form-grid--2,
+  .mt-form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .mt-form-grid--2,
+  .mt-form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  .mt-form-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mt-form-actions > .mt-button {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .mt-workspace-tabs,
+  .mt-form-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mt-switch {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.mt-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mt-switch__track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: var(--mt-border-size) solid var(--mt-border-strong);
+  border-radius: 999px;
+  background: var(--mt-bg-input);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.mt-switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--mt-text-muted);
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.mt-switch input:checked + .mt-switch__track {
+  border-color: var(--mt-accent);
+  background: var(--mt-accent-bg);
+}
+
+.mt-switch input:checked + .mt-switch__track .mt-switch__thumb {
+  transform: translateX(20px);
+  background: var(--mt-accent-strong);
+}
+
+.mt-switch input:focus-visible + .mt-switch__track {
+  outline: 1px solid var(--mt-accent);
+  outline-offset: 2px;
+}
+
+.mt-switch input:disabled + .mt-switch__track {
+  opacity: .5;
+  cursor: not-allowed;
+}

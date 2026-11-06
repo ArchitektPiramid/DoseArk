@@ -1,0 +1,58 @@
+:root {
+  /* Raw technical dark palette */
+  --mt-bg-app: #070b10;
+  --mt-bg-shell: #0a0f16;
+  --mt-bg-panel: #0d131b;
+  --mt-bg-panel-alt: #101822;
+  --mt-bg-panel-soft: #111b27;
+  --mt-bg-input: #080d13;
+
+  --mt-border: #253241;
+  --mt-border-soft: #1a2531;
+  --mt-border-strong: #3a4c60;
+
+  --mt-text: #d7dee8;
+  --mt-text-strong: #f3f7fb;
+  --mt-text-muted: #8b98a8;
+  --mt-text-dim: #5f6f80;
+
+  /* Main accent: blue-gray, not neon blue */
+  --mt-accent: #6f91b8;
+  --mt-accent-strong: #8aa9cc;
+  --mt-accent-muted: #223448;
+  --mt-accent-bg: #101d2b;
+
+  --mt-success: #57b77a;
+  --mt-success-bg: #0f2519;
+  --mt-warning: #c99a45;
+  --mt-warning-bg: #2a2110;
+  --mt-danger: #d36b6b;
+  --mt-danger-bg: #2d1518;
+
+  --mt-radius-none: 0;
+  --mt-radius-sm: 2px;
+  --mt-radius-md: 4px;
+
+  --mt-border-size: 1px;
+  --mt-border-size-strong: 2px;
+
+  --mt-space-1: 4px;
+  --mt-space-2: 8px;
+  --mt-space-3: 12px;
+  --mt-space-4: 16px;
+  --mt-space-5: 20px;
+  --mt-space-6: 24px;
+
+  --mt-control-height: 34px;
+  --mt-page-gap: 14px;
+  --mt-form-gap: 12px;
+  --mt-panel-padding: 12px;
+
+  --mt-sidebar-width: 268px;
+  --mt-sidebar-collapsed-width: 74px;
+
+  --mt-font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mt-font-mono:
+    "JetBrains Mono", "Cascadia Code", Consolas, ui-monospace, SFMono-Regular, monospace;
+}

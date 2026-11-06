@@ -1,0 +1,11 @@
+{
+  "products": {
+    "title": "Produkty"
+  },
+  "brands": {
+    "title": "Marki"
+  },
+  "nutrients": {
+    "title": "Składniki"
+  }
+}

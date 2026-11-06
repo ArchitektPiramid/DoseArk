@@ -1,0 +1,153 @@
+/* Yearly dose activity heatmap and responsive cells. */
+
+.mt-statistics-heatmap-wrap {
+  padding: 8px 2px 4px;
+}
+
+.mt-statistics-heatmap {
+  --mt-heatmap-cell: 30px;
+  --mt-heatmap-gap: 3px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(254px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.mt-statistics-heatmap__month {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--mt-border) 78%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--mt-bg-panel) 88%, transparent);
+}
+
+.mt-statistics-heatmap__month-title {
+  margin-bottom: 6px;
+  color: var(--mt-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.mt-statistics-heatmap__month-weekdays,
+.mt-statistics-heatmap__month-days {
+  display: grid;
+  grid-template-columns: repeat(7, var(--mt-heatmap-cell));
+  gap: var(--mt-heatmap-gap);
+  justify-content: center;
+}
+
+.mt-statistics-heatmap__month-weekdays {
+  margin-bottom: 3px;
+  color: var(--mt-text-dim);
+  font-size: 0.52rem;
+  text-align: center;
+}
+
+.mt-statistics-heatmap__month-weekdays span {
+  width: var(--mt-heatmap-cell);
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.mt-statistics-heatmap__placeholder {
+  width: var(--mt-heatmap-cell);
+  height: var(--mt-heatmap-cell);
+}
+
+.mt-statistics-heatmap__cell {
+  display: flex;
+  width: var(--mt-heatmap-cell);
+  height: var(--mt-heatmap-cell);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--mt-border) 76%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--mt-bg-panel) 76%, var(--mt-border));
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 55%);
+}
+
+.mt-statistics-heatmap--values-amount,
+.mt-statistics-heatmap--values-count {
+  --mt-heatmap-cell: 32px;
+}
+
+.mt-statistics-heatmap--values-both {
+  --mt-heatmap-cell: 34px;
+}
+
+.mt-statistics-heatmap__cell--1 { background: #2f7d4a; border-color: #3a9259; }
+.mt-statistics-heatmap__cell--2 { background: #74a83f; border-color: #86bb4b; }
+.mt-statistics-heatmap__cell--3 { background: #c2a83e; border-color: #d2b747; }
+.mt-statistics-heatmap__cell--4 { background: #c96f35; border-color: #dc7d3e; }
+.mt-statistics-heatmap__cell--5 { background: #b9403f; border-color: #d04b49; }
+
+.mt-statistics-heatmap__cell[title] {
+  cursor: default;
+}
+
+.mt-statistics-heatmap__cell[title]:hover {
+  outline: 1px solid var(--mt-text-strong);
+  outline-offset: 1px;
+}
+
+.mt-statistics-heatmap__cell-amount,
+.mt-statistics-heatmap__cell-count {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.mt-statistics-heatmap__cell-amount {
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.mt-statistics-heatmap__cell-count {
+  margin: 1px 0 0;
+  color: rgb(255 255 255 / 88%);
+  font-size: 0.47rem;
+  font-weight: 700;
+}
+
+.mt-statistics-heatmap--values-both .mt-statistics-heatmap__cell-amount {
+  font-size: 0.54rem;
+}
+
+.mt-statistics-heatmap--values-both .mt-statistics-heatmap__cell-count {
+  font-size: 0.45rem;
+}
+
+.mt-statistics-heatmap__legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 10px;
+  color: var(--mt-text-dim);
+  font-size: 0.68rem;
+}
+
+.mt-statistics-heatmap__legend .mt-statistics-heatmap__cell {
+  width: 11px;
+  height: 11px;
+  min-width: 11px;
+  border-radius: 2px;
+}
+
+@media (max-width: 760px) {
+  .mt-statistics-heatmap {
+    grid-template-columns: repeat(auto-fit, minmax(246px, 1fr));
+  }
+}
+

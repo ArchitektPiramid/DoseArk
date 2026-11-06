@@ -1,0 +1,191 @@
+/* API profile manager base layout. */
+/* Profile manager */
+.mt-profile-manager {
+  display: grid;
+  grid-template-columns: minmax(430px, .95fr) minmax(0, 1.05fr);
+  gap: 12px;
+  min-width: 0;
+  align-items: start;
+}
+
+.mt-profile-list,
+.mt-profile-editor {
+  min-width: 0;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-panel-alt);
+}
+
+.mt-profile-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 9px;
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+  color: var(--mt-text-strong);
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.mt-profile-list__header small {
+  color: var(--mt-text-dim);
+  font-family: var(--mt-font-mono);
+  font-size: .54rem;
+}
+.mt-profile-list__items { display: grid; gap: 5px; padding: 7px; }
+.mt-profile-card {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+  color: var(--mt-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mt-profile-card:hover { border-color: var(--mt-border); }
+.mt-profile-card[data-selected="true"] { border-color: var(--mt-accent); background: var(--mt-bg-panel-soft); }
+.mt-profile-card__icon { display: grid; place-items: center; width: 28px; height: 28px; color: var(--mt-text-muted); }
+.mt-profile-card__content { display: grid; min-width: 0; gap: 2px; }
+.mt-profile-card__name { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--mt-text-strong); font-size: .74rem; font-weight: 700; }
+.mt-profile-card__name small { color: var(--mt-accent-strong); font-family: var(--mt-font-mono); font-size: .54rem; }
+.mt-profile-card__meta,
+.mt-profile-card__description { color: var(--mt-text-muted); font-size: .62rem; }
+.mt-profile-card code { overflow: hidden; color: var(--mt-text-dim); font-family: var(--mt-font-mono); font-size: .6rem; text-overflow: ellipsis; white-space: nowrap; }
+
+.mt-profile-editor { padding: 10px; }
+.mt-profile-editor__header { display: grid; gap: 8px; padding-bottom: 9px; border-bottom: var(--mt-border-size) solid var(--mt-border-soft); }
+.mt-profile-editor__heading { min-width: 0; }
+.mt-profile-editor__title { color: var(--mt-text-strong); font-size: .84rem; font-weight: 750; }
+.mt-profile-editor__header small { display: block; margin-top: 2px; color: var(--mt-text-dim); font-size: .62rem; }
+.mt-profile-editor__overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+}
+.mt-profile-editor__overview-fact {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  padding: 6px 8px;
+  border-right: var(--mt-border-size) solid var(--mt-border-soft);
+}
+.mt-profile-editor__overview-fact:last-child { border-right: 0; }
+.mt-profile-editor__overview-fact small { margin: 0; color: var(--mt-text-dim); font-size: .54rem; font-weight: 650; letter-spacing: .035em; text-transform: uppercase; }
+.mt-profile-editor__overview-fact code { overflow: hidden; color: var(--mt-text); font-family: var(--mt-font-mono); font-size: .61rem; text-overflow: ellipsis; white-space: nowrap; }
+.mt-profile-detail-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin: 9px 0 0; padding-bottom: 9px; border-bottom: var(--mt-border-size) solid var(--mt-border-soft); }
+.mt-profile-detail-tab { min-width: 0; justify-content: center; }
+.mt-profile-detail-pane { min-width: 0; }
+.mt-profile-editor__section { padding-top: 10px; }
+.mt-profile-editor__section h3 { margin: 0 0 7px; color: var(--mt-text-muted); font-size: .64rem; letter-spacing: .04em; text-transform: uppercase; }
+.mt-profile-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mt-profile-section-heading h3 { margin-bottom: 0; }
+.mt-profile-backup-list { max-height: 180px; }
+
+.mt-profile-runtime-section { padding-top: 10px; }
+.mt-profile-runtime-source {
+  display: grid;
+  grid-template-columns: minmax(125px, .28fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+  padding-bottom: 7px;
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+}
+.mt-profile-runtime-source span { color: var(--mt-text-muted); font-size: .64rem; }
+.mt-profile-runtime-source code { overflow-wrap: anywhere; color: var(--mt-text); font-family: var(--mt-font-mono); font-size: .63rem; }
+.mt-profile-runtime-vars {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 10px;
+  margin-top: 5px;
+}
+.mt-profile-runtime-var {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  min-height: 42px;
+  padding: 6px 8px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+}
+.mt-profile-runtime-var code { overflow: hidden; color: var(--mt-accent-strong); font-family: var(--mt-font-mono); font-size: .59rem; text-overflow: ellipsis; white-space: nowrap; }
+.mt-profile-runtime-var span { min-width: 0; overflow-wrap: anywhere; color: var(--mt-text); font-family: var(--mt-font-mono); font-size: .63rem; }
+.mt-profile-variable-group + .mt-profile-variable-group { margin-top: 10px; }
+.mt-profile-variable-group h3 { margin: 0 0 4px; color: var(--mt-text-muted); font-size: .61rem; letter-spacing: .04em; text-transform: uppercase; }
+
+.mt-settings-env-vars { margin-top: 9px; border: var(--mt-border-size) solid var(--mt-border-soft); }
+.mt-settings-env-vars__header,
+.mt-settings-env-var {
+  display: grid;
+  grid-template-columns: minmax(210px, .42fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 8px;
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+}
+.mt-settings-env-vars__header { color: var(--mt-text-muted); font-size: .61rem; font-weight: 700; text-transform: uppercase; }
+.mt-settings-env-var:last-child { border-bottom: 0; }
+.mt-settings-env-var code { color: var(--mt-accent-strong); font-family: var(--mt-font-mono); font-size: .62rem; }
+.mt-settings-env-var span { min-width: 0; overflow-wrap: anywhere; color: var(--mt-text); font-family: var(--mt-font-mono); font-size: .63rem; }
+
+.mt-settings-core-overview { margin-bottom: var(--mt-space-3); }
+.mt-settings-core-meta {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 8px;
+  border: var(--mt-border-size) solid var(--mt-border-soft);
+  background: var(--mt-bg-input);
+  color: var(--mt-text-muted);
+  font-size: .64rem;
+}
+.mt-settings-core-meta > span {
+  min-width: 0;
+  padding: 7px 9px;
+  border-right: var(--mt-border-size) solid var(--mt-border-soft);
+}
+.mt-settings-core-meta > span:last-child { border-right: 0; }
+.mt-settings-core-meta strong {
+  display: block;
+  min-width: 0;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--mt-text);
+  font-family: var(--mt-font-mono);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mt-profile-source-list { display: grid; gap: 4px; }
+.mt-profile-source-list > div {
+  display: grid;
+  grid-template-columns: minmax(155px, .36fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 30px;
+  padding: 4px 0;
+  border-bottom: var(--mt-border-size) solid var(--mt-border-soft);
+}
+.mt-profile-source-list span { color: var(--mt-text-muted); font-size: .64rem; }
+.mt-profile-source-list code { min-width: 0; overflow-wrap: anywhere; color: var(--mt-text-dim); font-family: var(--mt-font-mono); font-size: .61rem; }
+.mt-profile-progress-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 8px;
+  margin-top: 8px;
+  color: var(--mt-text-muted);
+  font-size: .65rem;
+  line-height: 1.35;
+}
+.mt-profile-progress-note--top { margin: 0 0 9px; padding: 7px 9px; border: var(--mt-border-size) solid var(--mt-border); background: var(--mt-bg-input); }
+.mt-profile-progress-note strong { color: var(--mt-warning); font-family: var(--mt-font-mono); font-size: .6rem; }
+.mt-profile-progress-note code { color: var(--mt-text); font-family: var(--mt-font-mono); font-size: .62rem; }
+

@@ -1,0 +1,15 @@
+{
+  "page": {
+    "title": "Magazyn",
+    "description": "Zarządzaj kupionymi opakowaniami/partiami i pozostałym stanem."
+  },
+  "stockMovements": {
+    "title": "Historia zmian stanu",
+    "empty": "Brak zmian stanu.",
+    "movementType": "Typ",
+    "quantityDelta": "Zmiana",
+    "quantityAfter": "Po zmianie",
+    "occurredAt": "Czas",
+    "reason": "Powód"
+  }
+}
