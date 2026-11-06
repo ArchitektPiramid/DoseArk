@@ -18,22 +18,14 @@ pnpm install --frozen-lockfile
 ```
 
 Create your local API configuration:
-
-```powershell
-# PowerShell (Windows)
-Copy-Item .env.example .env
-```
-
-Or on Linux/macOS: `cp .env.example .env`.
+PowerShell (Windows) `Copy-Item .env.example .env` or on Linux/macOS: `cp .env.example .env`.
 
 In **two terminals** opened at the repository root:
 
 ```bash
 # terminal A: backend (automatically initializes SQLite and runs migrations)
 pnpm dev:api
-```
 
-```bash
 # terminal B: frontend
 pnpm dev:web
 ```
@@ -85,7 +77,7 @@ CI is intentionally not configured yet. See [Development](docs/current/DEVELOPME
 
 ## Future work
 
-**Docker / Docker Compose deployment**, Android, Tauri and offline synchronization are future plans. The existing `docker/` directory is experimental and **not** a supported deployment method; see [TODO.md](TODO.md).
+**Docker / Docker Compose deployment**, Android, Tauri and offline synchronization are future plans. The existing `docker/` directory is experimental and **not** a supported deployment method.
 
 ## Security and license
 

@@ -1,0 +1,15 @@
+[package]
+name = "doseark_db_postgres"
+version = "0.1.1"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+doseark_application = { path = "../doseark_application" }
+doseark_domain = { path = "../doseark_domain" }
+sqlx.workspace = true
+tracing.workspace = true
+uuid.workspace = true
