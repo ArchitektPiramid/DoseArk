@@ -156,6 +156,7 @@ async fn sqlite_reports_match_daily_and_trend_boundaries() {
     assert_eq!(daily.rows[0].amount_total, 100.0);
     assert_eq!(daily.rows[0].dose_count, 1);
     assert_eq!(daily.dose_logs.len(), 1);
+    assert_eq!(daily.dose_logs[0].taken_at, utc("2026-08-10T23:30:00Z"));
 
     let trend = repositories
         .reports
@@ -186,6 +187,9 @@ async fn sqlite_reports_match_daily_and_trend_boundaries() {
     assert_eq!(trend.days[2].date, date("2026-08-13"));
     assert_eq!(trend.days[2].amount_total, 0.0);
     assert_eq!(trend.events.len(), 2);
+    assert_eq!(trend.events[0].amount, 100.0);
+    assert_eq!(trend.events[0].unit, "mg");
+    assert_eq!(trend.events[1].amount, 200.0);
 
     let product_trend = repositories
         .reports
@@ -213,6 +217,8 @@ async fn sqlite_reports_match_daily_and_trend_boundaries() {
     assert_eq!(product_trend.events.len(), 2);
     assert_eq!(product_trend.events[0].amount, 1.0);
     assert_eq!(product_trend.events[1].amount, 2.0);
+    assert_eq!(product_trend.events[0].product_id, product.id);
+    assert_eq!(product_trend.events[0].product_name, "DoseArk Reports Product");
 
     pool.close().await;
     remove_sqlite_files(&database_path);
