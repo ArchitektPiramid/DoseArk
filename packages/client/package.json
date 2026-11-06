@@ -1,0 +1,15 @@
+{
+  "name": "@doseark/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@doseark/types": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit --pretty false",
+    "lint": "tsc --noEmit --noUnusedLocals --noUnusedParameters --pretty false"
+  }
+}
