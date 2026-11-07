@@ -12,7 +12,7 @@ use doseark_domain::{
 use std::sync::Arc;
 use uuid::Uuid;
 
-/// Validates intake requests and manages dose history.
+/// Validates intake requests and manages dose history
 #[derive(Clone)]
 pub struct DoseLogService {
     repo: Arc<dyn DoseLogRepository>,
@@ -23,6 +23,7 @@ impl DoseLogService {
         Self { repo }
     }
 
+    /// Caps pagination before requesting recorded doses
     pub async fn list_dose_logs(&self, input: DoseLogListInput) -> ApplicationResult<DoseLogPage> {
         let limit = input.limit.clamp(1, 100);
         let offset = input.offset.max(0);
@@ -36,12 +37,13 @@ impl DoseLogService {
             .await
     }
 
-    /// Validates a new intake before repository persistence.
+    /// Validates a new intake before repository persistence
     pub async fn create_dose_log(&self, input: CreateDoseLogInput) -> ApplicationResult<DoseLog> {
         validate_dose_log(&input)?;
         self.repo.create_dose_log(input).await
     }
 
+    /// Checks edited intake fields before updating the history
     pub async fn update_dose_log(
         &self,
         id: Uuid,
@@ -51,7 +53,7 @@ impl DoseLogService {
         self.repo.update_dose_log(id, input).await
     }
 
-    /// Cancels a recorded intake through its repository.
+    /// Cancels a recorded intake through its repository
     pub async fn cancel_dose_log(&self, id: Uuid) -> ApplicationResult<DoseLog> {
         self.repo.cancel_dose_log(id).await
     }

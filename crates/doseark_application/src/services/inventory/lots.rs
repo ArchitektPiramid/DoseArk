@@ -16,6 +16,7 @@ impl InventoryLotService {
         Self { repo }
     }
 
+    /// Lists inventory lots through the configured storage adapter
     pub async fn list_inventory_lots(&self) -> ApplicationResult<Vec<InventoryLot>> {
         self.repo.list_inventory_lots().await
     }

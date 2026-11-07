@@ -11,8 +11,8 @@ use crate::{
     StorageLocationService,
 };
 
-#[derive(Clone)]
 /// Catalog adapters shared by catalog-oriented services
+#[derive(Clone)]
 pub struct CatalogRepositoryBundle {
     pub brands: Arc<dyn BrandRepository>,
     pub products: Arc<dyn ProductRepository>,
@@ -21,8 +21,8 @@ pub struct CatalogRepositoryBundle {
     pub storage_locations: Arc<dyn StorageLocationRepository>,
 }
 
-#[derive(Clone)]
 /// Storage adapters used for inventory and dosing
+#[derive(Clone)]
 pub struct InventoryDosingRepositoryBundle {
     pub inventory_lots: Arc<dyn InventoryLotRepository>,
     pub stock_movements: Arc<dyn StockMovementRepository>,
@@ -30,8 +30,8 @@ pub struct InventoryDosingRepositoryBundle {
     pub dose_log_nutrients: Arc<dyn DoseLogNutrientRepository>,
 }
 
-#[derive(Clone)]
 /// Complete set of persistence ports supplied by the runtime
+#[derive(Clone)]
 pub struct RepositoryBundle {
     pub brands: Arc<dyn BrandRepository>,
     pub products: Arc<dyn ProductRepository>,
@@ -45,8 +45,8 @@ pub struct RepositoryBundle {
     pub storage_locations: Arc<dyn StorageLocationRepository>,
 }
 
-#[derive(Clone)]
 /// Application services wired to their repository implementations
+#[derive(Clone)]
 pub struct AppServices {
     pub brands: BrandService,
     pub products: ProductService,
