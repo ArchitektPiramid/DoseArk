@@ -1,3 +1,5 @@
+//! Zestawy zależności wstrzykiwanych do serwisów aplikacji
+
 use std::sync::Arc;
 
 use crate::{
@@ -9,7 +11,7 @@ use crate::{
     StorageLocationService,
 };
 
-
+/// Catalog adapters shared by catalog-oriented services
 #[derive(Clone)]
 pub struct CatalogRepositoryBundle {
     pub brands: Arc<dyn BrandRepository>,
@@ -19,7 +21,7 @@ pub struct CatalogRepositoryBundle {
     pub storage_locations: Arc<dyn StorageLocationRepository>,
 }
 
-
+/// Storage adapters used for inventory and dosing
 #[derive(Clone)]
 pub struct InventoryDosingRepositoryBundle {
     pub inventory_lots: Arc<dyn InventoryLotRepository>,
@@ -28,6 +30,7 @@ pub struct InventoryDosingRepositoryBundle {
     pub dose_log_nutrients: Arc<dyn DoseLogNutrientRepository>,
 }
 
+/// Complete set of persistence ports supplied by the runtime
 #[derive(Clone)]
 pub struct RepositoryBundle {
     pub brands: Arc<dyn BrandRepository>,
@@ -42,6 +45,7 @@ pub struct RepositoryBundle {
     pub storage_locations: Arc<dyn StorageLocationRepository>,
 }
 
+/// Application services wired to their repository implementations
 #[derive(Clone)]
 pub struct AppServices {
     pub brands: BrandService,
@@ -57,6 +61,7 @@ pub struct AppServices {
 }
 
 impl AppServices {
+    /// Construct the service graph from injected repository ports
     pub fn from_repositories(repositories: RepositoryBundle) -> Self {
         Self {
             brands: BrandService::new(repositories.brands),
