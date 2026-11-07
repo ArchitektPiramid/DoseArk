@@ -1,7 +1,9 @@
+//! Konwersja pól produktu i wartości słownikowych SQLite
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{DosageForm, Product, ProductCategory, ProductUserImportance};
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct ProductRow {
@@ -114,9 +116,7 @@ fn product_user_importance_from_db(value: &str) -> ApplicationResult<ProductUser
     }
 }
 
-pub(super) fn product_user_importance_to_db(
-    value: &ProductUserImportance,
-) -> &'static str {
+pub(super) fn product_user_importance_to_db(value: &ProductUserImportance) -> &'static str {
     match value {
         ProductUserImportance::Low => "low",
         ProductUserImportance::Normal => "normal",
