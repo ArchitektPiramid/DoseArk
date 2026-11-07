@@ -8,6 +8,8 @@ mod create;
 mod fixture;
 #[path = "inventory_dosing/history.rs"]
 mod history;
+#[path = "inventory_dosing/lot_identity.rs"]
+mod lot_identity;
 #[path = "inventory_dosing/serving.rs"]
 mod serving;
 #[path = "inventory_dosing/update.rs"]

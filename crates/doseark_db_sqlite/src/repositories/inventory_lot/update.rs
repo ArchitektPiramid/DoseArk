@@ -32,6 +32,13 @@ pub(super) async fn update_inventory_lot(
     let now = Utc::now();
     let mut tx = begin_immediate(pool).await?;
     let previous = select_inventory_lot(&mut tx, id).await?;
+
+    // Once created, a lot keeps its product identity across doses and movements
+    if previous.product_id_uuid() != input.product_id {
+        return Err(ApplicationError::Validation(
+            "Inventory lot product cannot be changed after creation".into(),
+        ));
+    }
     let normalized_units_remaining = normalize_stock_quantity(input.units_remaining);
 
     let result = sqlx::query(

@@ -7,9 +7,9 @@ use doseark_application::InventoryDosingRepositoryBundle;
 use doseark_db_sqlite::{create_sqlite_pool, run_migrations, SqliteStorage, SqliteStorageConfig};
 use doseark_domain::{
     CreateBrandInput, CreateDoseLogInput, CreateInventoryLotInput, CreateNutrientInput,
-    CreateProductInput, CreateStorageLocationInput, DosageForm, DoseLog, InventoryLotStatus,
-    NutrientKind, ProductCategory, SaveProductNutrientInput, UpdateDoseLogInput,
-    UpdateInventoryLotInput,
+    CreateProductInput, CreateStorageLocationInput, DosageForm, DoseLog, InventoryLot,
+    InventoryLotStatus, NutrientKind, ProductCategory, SaveProductNutrientInput,
+    UpdateDoseLogInput, UpdateInventoryLotInput,
 };
 use sqlx::SqlitePool;
 use uuid::Uuid;
@@ -193,6 +193,70 @@ impl Fixture {
             reason: None,
             notes: Some("edited dose".into()),
         }
+    }
+
+    /// Creates a second product for cross-product inventory checks
+    pub async fn another_product(&self) -> Uuid {
+        let storage = SqliteStorage::new(self.pool.clone(), self.path.display().to_string());
+        storage
+            .catalog_repositories()
+            .products
+            .create_product(CreateProductInput {
+                brand_id: None,
+                name: "Other test product".into(),
+                category: ProductCategory::Supplement,
+                dosage_form: DosageForm::Tablet,
+                serving_unit: "tablet".into(),
+                serving_size_units: 2.0,
+                unit_weight_mg: None,
+                barcode: None,
+                description: None,
+                ui_color: None,
+                ui_icon: None,
+                user_importance: None,
+            })
+            .await
+            .expect("other product should be created")
+            .id
+    }
+
+    /// Reuses current lot fields so tests change only product or status
+    pub async fn update_lot(
+        &self,
+        product_id: Uuid,
+        status: InventoryLotStatus,
+    ) -> Result<InventoryLot, doseark_application::ApplicationError> {
+        let previous = self
+            .repos
+            .inventory_lots
+            .list_inventory_lots()
+            .await
+            .unwrap()
+            .into_iter()
+            .find(|lot| lot.id == self.lot_id)
+            .unwrap();
+
+        self.repos
+            .inventory_lots
+            .update_inventory_lot(
+                self.lot_id,
+                UpdateInventoryLotInput {
+                    product_id,
+                    lot_number: previous.lot_number,
+                    storage_location: previous.storage_location,
+                    storage_location_id: previous.storage_location_id,
+                    units_initial: previous.units_initial,
+                    units_remaining: previous.units_remaining,
+                    purchase_date: previous.purchase_date,
+                    opened_date: previous.opened_date,
+                    expires_at: previous.expires_at,
+                    price_amount: previous.price_amount,
+                    price_currency: previous.price_currency,
+                    status,
+                    notes: previous.notes,
+                },
+            )
+            .await
     }
 
     pub async fn remaining(&self) -> f64 {
