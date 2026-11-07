@@ -99,4 +99,5 @@ fn error_check(key: &'static str, message: impl Into<String>) -> ValidationCheck
 }
 
 #[cfg(test)]
+#[path = "../tests/unit/profile_validation.rs"]
 mod tests;

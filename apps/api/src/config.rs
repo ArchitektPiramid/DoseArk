@@ -9,8 +9,8 @@ use anyhow::{anyhow, Context};
 
 mod helpers;
 use self::helpers::{
-    default_backup_dir, env_or_legacy_with_name, env_value_or_legacy,
-    explicit_backup_dir, summarize_database_url,
+    default_backup_dir, env_or_legacy_with_name, env_value_or_legacy, explicit_backup_dir,
+    summarize_database_url,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -249,32 +249,5 @@ pub fn env_or_legacy(primary: &str, legacy: &str) -> Option<String> {
 }
 
 #[cfg(test)]
-mod tests {
-    use std::path::{Path, PathBuf};
-
-    use super::{default_backup_dir, summarize_database_url, StorageBackend};
-
-    #[test]
-    fn hides_database_credentials() {
-        assert_eq!(
-            summarize_database_url("postgres://user:secret@db.local:5432/medtaker"),
-            "db.local:5432/medtaker"
-        );
-    }
-
-    #[test]
-    fn removes_query_parameters() {
-        assert_eq!(
-            summarize_database_url("postgres://localhost/medtaker?sslmode=disable"),
-            "localhost/medtaker"
-        );
-    }
-
-    #[test]
-    fn sqlite_backups_default_next_to_database() {
-        assert_eq!(
-            default_backup_dir(StorageBackend::Sqlite, Path::new("./data/doseark.sqlite")),
-            PathBuf::from("./data/backups")
-        );
-    }
-}
+#[path = "../tests/unit/config.rs"]
+mod tests;

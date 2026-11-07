@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::state::AppState;
 
-use super::error::{map_application_error, ApiError};
+use crate::routes::error::{map_application_error, ApiError};
 
 pub fn router() -> Router<AppState> {
     Router::new()

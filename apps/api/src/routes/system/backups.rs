@@ -16,7 +16,7 @@ use tokio::fs;
 
 use crate::state::AppState;
 
-use super::error::ApiError;
+use crate::routes::error::ApiError;
 
 #[derive(Debug, Serialize)]
 struct BackupListResponse {
@@ -39,10 +39,7 @@ struct BackupFileResponse {
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/admin/backups", get(list_backups).post(create_backup))
-        .route(
-            "/api/admin/backups/{file_name}/download",
-            get(download_backup),
-        )
+        .route("/api/admin/backups/{file_name}/download", get(download_backup))
 }
 
 async fn list_backups(State(state): State<AppState>) -> Json<BackupListResponse> {
@@ -272,7 +269,10 @@ async fn collect_backups(directory: &Path) -> std::io::Result<Vec<BackupFileResp
             download_path: format!("/api/admin/backups/{file_name}/download"),
             name: file_name,
             size_bytes: metadata.len(),
-            modified_at: metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH).into(),
+            modified_at: metadata
+                .modified()
+                .unwrap_or(SystemTime::UNIX_EPOCH)
+                .into(),
         });
     }
 
@@ -286,7 +286,10 @@ async fn backup_file_response(path: &Path, file_name: &str) -> std::io::Result<B
     Ok(BackupFileResponse {
         name: file_name.to_string(),
         size_bytes: metadata.len(),
-        modified_at: metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH).into(),
+        modified_at: metadata
+            .modified()
+            .unwrap_or(SystemTime::UNIX_EPOCH)
+            .into(),
         format: backup_format(file_name).to_string(),
         download_path: format!("/api/admin/backups/{file_name}/download"),
     })
@@ -294,10 +297,7 @@ async fn backup_file_response(path: &Path, file_name: &str) -> std::io::Result<B
 
 fn is_safe_file_name(file_name: &str) -> bool {
     !file_name.is_empty()
-        && Path::new(file_name)
-            .file_name()
-            .and_then(|name| name.to_str())
-            == Some(file_name)
+        && Path::new(file_name).file_name().and_then(|name| name.to_str()) == Some(file_name)
         && !file_name.contains('/')
         && !file_name.contains('\\')
 }

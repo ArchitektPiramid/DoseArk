@@ -2,19 +2,27 @@
 
 mod query;
 
-use axum::{extract::{Query, State}, http::StatusCode, routing::get, Json, Router};
-use doseark_domain::{DailyIntakeReport, NutrientTrendReport};
-use crate::state::AppState;
-use super::error::{map_application_error, ApiError};
 use self::query::{
-    build_daily_intake_input, build_nutrient_trend_input,
-    DailyIntakeReportQuery, NutrientTrendReportQuery,
+    build_daily_intake_input, build_nutrient_trend_input, DailyIntakeReportQuery,
+    NutrientTrendReportQuery,
 };
+use crate::routes::error::{map_application_error, ApiError};
+use crate::state::AppState;
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    routing::get,
+    Json, Router,
+};
+use doseark_domain::{DailyIntakeReport, NutrientTrendReport};
 
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/reports/daily-intake", get(get_daily_intake_report))
-        .route("/api/reports/nutrient-trend", get(get_nutrient_trend_report))
+        .route(
+            "/api/reports/nutrient-trend",
+            get(get_nutrient_trend_report),
+        )
 }
 
 async fn get_daily_intake_report(
@@ -31,7 +39,8 @@ async fn get_daily_intake_report(
     );
 
     state
-        .services.reports
+        .services
+        .reports
         .get_daily_intake_report(input)
         .await
         .map(Json)
@@ -57,7 +66,8 @@ async fn get_nutrient_trend_report(
     );
 
     state
-        .services.reports
+        .services
+        .reports
         .get_nutrient_trend_report(input)
         .await
         .map(Json)

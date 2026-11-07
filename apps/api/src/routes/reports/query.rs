@@ -152,4 +152,5 @@ fn bad_request(message: String) -> (StatusCode, Json<ApiError>) {
 }
 
 #[cfg(test)]
+#[path = "../../../tests/unit/report_queries.rs"]
 mod tests;
