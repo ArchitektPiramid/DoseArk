@@ -1,3 +1,5 @@
+//! Diagnostyka i metadane aktywnej bazy SQLite
+
 use async_trait::async_trait;
 use doseark_application::{
     ApplicationError, ApplicationResult, StorageCapabilities, StorageDiagnostics, StorageEngine,
@@ -19,6 +21,7 @@ impl SqliteDiagnostics {
         }
     }
 
+    /// Reads the SQLite version and current database settings
     async fn query_runtime_info(&self) -> Result<StorageRuntimeInfo, sqlx::Error> {
         let engine_version: String = sqlx::query_scalar("SELECT sqlite_version()")
             .fetch_one(&self.pool)
@@ -65,6 +68,7 @@ impl StorageDiagnostics for SqliteDiagnostics {
         self.query_runtime_info().await.map_err(map_sqlx_error)
     }
 
+    /// Returns overall size and table statistics for the current database
     async fn overview(&self) -> ApplicationResult<StorageOverview> {
         let runtime = self.query_runtime_info().await.map_err(map_sqlx_error)?;
         let page_count: i64 = sqlx::query_scalar("PRAGMA page_count")

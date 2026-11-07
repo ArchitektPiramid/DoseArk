@@ -1,10 +1,12 @@
+//! Mapowanie rekordów raportów i trendów z SQLite
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::{NaiveDate, Utc};
 use doseark_application::ApplicationError;
 use doseark_domain::{
     DailyIntakeReportRow, DoseLog, DoseLogStatus, NutrientKind, NutrientTrendDay,
     NutrientTrendEvent, NutrientTrendOption,
 };
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
 /// Daily nutrient totals returned by the SQLite aggregate
 #[derive(Debug, sqlx::FromRow)]

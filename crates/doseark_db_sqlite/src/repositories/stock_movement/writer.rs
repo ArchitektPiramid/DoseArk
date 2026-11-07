@@ -1,3 +1,5 @@
+//! Zapis ruchów magazynowych wewnątrz transakcji
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
@@ -14,6 +16,7 @@ pub(crate) struct InsertStockMovementInput<'a> {
     pub notes: Option<String>,
 }
 
+/// Appends a movement using the caller's open transaction
 pub(crate) async fn insert_stock_movement(
     tx: &mut Transaction<'_, Sqlite>,
     input: InsertStockMovementInput<'_>,

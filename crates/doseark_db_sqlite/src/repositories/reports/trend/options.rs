@@ -1,6 +1,8 @@
-use sqlx::SqlitePool;
+//! Wybór składników dostępnych w zakresie raportu
+
 use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendOption, NutrientTrendReportInput};
+use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendOptionSql};
 

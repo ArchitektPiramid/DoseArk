@@ -1,3 +1,5 @@
+//! Konwersje typów UUID dla sterownika SQLite
+
 use sqlx::types::Text;
 use uuid::Uuid;
 

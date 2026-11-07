@@ -1,9 +1,11 @@
+//! Agregacja ilości składników w kolejnych dniach
+
 use std::collections::BTreeMap;
 
 use chrono::Days;
-use sqlx::SqlitePool;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{NutrientTrendDay, NutrientTrendReportInput};
+use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendDaySql};
 

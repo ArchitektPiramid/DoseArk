@@ -1,7 +1,9 @@
+//! Mapowanie ruchów magazynowych na modele domenowe
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{StockMovement, StockMovementType};
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct StockMovementRow {

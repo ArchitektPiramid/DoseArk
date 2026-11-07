@@ -1,10 +1,12 @@
+//! Składanie serii danych potrzebnych do wykresów
+
 mod days;
 mod events;
 mod options;
 
-use sqlx::SqlitePool;
 use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendReport, NutrientTrendReportInput};
+use sqlx::SqlitePool;
 
 /// Build the trend using options, daily totals and individual events
 pub(super) async fn load(

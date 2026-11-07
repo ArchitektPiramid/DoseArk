@@ -1,6 +1,8 @@
-use sqlx::SqlitePool;
+//! Dobowe sumowanie dawek i składników
+
 use doseark_application::ApplicationResult;
 use doseark_domain::{DailyIntakeReport, DailyIntakeReportInput, DailyIntakeReportRow, DoseLog};
+use sqlx::SqlitePool;
 
 use super::{
     map_sqlx_error,

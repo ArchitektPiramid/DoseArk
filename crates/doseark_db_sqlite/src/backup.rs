@@ -1,3 +1,5 @@
+//! Operacje tworzenia i przywracania kopii bazy SQLite
+
 use std::path::Path;
 
 use async_trait::async_trait;
@@ -23,6 +25,7 @@ impl StorageBackupManager for SqliteBackupManager {
         StorageEngine::Sqlite
     }
 
+    /// Uses SQLite VACUUM INTO to create a consistent backup file
     async fn create_backup(&self, target: &Path) -> ApplicationResult<()> {
         if let Some(parent) = target.parent().filter(|path| !path.as_os_str().is_empty()) {
             std::fs::create_dir_all(parent)

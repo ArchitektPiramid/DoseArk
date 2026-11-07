@@ -1,3 +1,5 @@
+//! Odczyt historycznych składników zarejestrowanych dawek
+
 mod mapping;
 
 use async_trait::async_trait;
@@ -21,6 +23,7 @@ impl SqliteDoseLogNutrientRepository {
 
 #[async_trait]
 impl DoseLogNutrientRepository for SqliteDoseLogNutrientRepository {
+    /// Loads nutrient amounts saved with a recorded dose
     async fn list_dose_log_nutrients(
         &self,
         dose_log_id: Uuid,

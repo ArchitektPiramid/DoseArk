@@ -1,3 +1,5 @@
+//! Tworzenie i aktualizacja słownika składników
+
 mod mapping;
 
 use async_trait::async_trait;
@@ -53,6 +55,7 @@ impl NutrientRepository for SqliteNutrientRepository {
         rows.into_iter().map(Nutrient::try_from).collect()
     }
 
+    /// Adds a reusable nutrient definition to the catalog
     async fn create_nutrient(&self, input: CreateNutrientInput) -> ApplicationResult<Nutrient> {
         tracing::info!(
             canonical_name = %input.canonical_name,
@@ -117,7 +120,12 @@ impl NutrientRepository for SqliteNutrientRepository {
         Nutrient::try_from(row)
     }
 
-    async fn update_nutrient(&self, id: Uuid, input: UpdateNutrientInput) -> ApplicationResult<Nutrient> {
+    /// Updates nutrient metadata while preserving its identifier
+    async fn update_nutrient(
+        &self,
+        id: Uuid,
+        input: UpdateNutrientInput,
+    ) -> ApplicationResult<Nutrient> {
         tracing::info!(
             nutrient_id = %id,
             canonical_name = %input.canonical_name,

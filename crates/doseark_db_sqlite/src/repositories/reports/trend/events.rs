@@ -1,7 +1,9 @@
+//! Szczegóły zdarzeń dawkowania w raportach trendów
+
 use chrono::Duration;
-use sqlx::SqlitePool;
 use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendEvent, NutrientTrendReportInput};
+use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendEventSql};
 

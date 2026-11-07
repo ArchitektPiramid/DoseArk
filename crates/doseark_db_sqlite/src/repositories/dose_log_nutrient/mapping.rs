@@ -1,7 +1,9 @@
+//! Mapowanie zapisanych składników dawek
+
+use crate::sqlite_types::{into_uuid, SqliteUuid};
 use chrono::Utc;
 use doseark_application::ApplicationError;
 use doseark_domain::{DoseLogNutrient, NutrientKind};
-use crate::sqlite_types::{into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct DoseLogNutrientRow {

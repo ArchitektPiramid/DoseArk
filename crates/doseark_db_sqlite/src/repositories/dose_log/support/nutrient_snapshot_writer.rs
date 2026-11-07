@@ -1,11 +1,12 @@
 //! Utrwalanie historycznych ilości składników przyjętej dawki
 
+use crate::sqlite_types::SqliteUuid;
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
 use uuid::Uuid;
-use crate::sqlite_types::SqliteUuid;
 
+/// Product composition fields captured at the time of a dose
 #[derive(Debug, sqlx::FromRow)]
 struct ProductNutrientSnapshotSourceRow {
     nutrient_id: SqliteUuid,
@@ -22,6 +23,8 @@ struct ProductNutrientSnapshotSourceRow {
     reference_source: Option<String>,
 }
 
+/// Loads product nutrients and stores their calculated dose amounts
+/// The multiplier comes from the validated product serving size
 pub(in crate::repositories::dose_log) async fn insert_dose_log_nutrient_snapshots(
     tx: &mut Transaction<'_, Sqlite>,
     dose_log_id: Uuid,
@@ -108,6 +111,7 @@ pub(in crate::repositories::dose_log) async fn insert_dose_log_nutrient_snapshot
     Ok(())
 }
 
+/// Reference value and its source after resolving overrides
 struct ResolvedReference {
     reference_daily_amount: Option<f64>,
     reference_daily_unit: Option<String>,
@@ -115,13 +119,12 @@ struct ResolvedReference {
     percent_of_reference: Option<f64>,
 }
 
-fn resolve_reference(
-    row: &ProductNutrientSnapshotSourceRow,
-    amount: f64,
-) -> ResolvedReference {
-    if let (Some(reference_amount), Some(reference_unit)) =
-        (row.reference_daily_amount, row.reference_daily_unit.as_deref())
-    {
+/// Prefers label-specific reference amounts before global values
+fn resolve_reference(row: &ProductNutrientSnapshotSourceRow, amount: f64) -> ResolvedReference {
+    if let (Some(reference_amount), Some(reference_unit)) = (
+        row.reference_daily_amount,
+        row.reference_daily_unit.as_deref(),
+    ) {
         if reference_amount > 0.0 && reference_unit == row.unit {
             return ResolvedReference {
                 reference_daily_amount: Some(reference_amount),
@@ -136,9 +139,10 @@ fn resolve_reference(
         }
     }
 
-    if let (Some(reference_amount), Some(reference_unit)) =
-        (row.label_reference_amount, row.label_reference_unit.as_deref())
-    {
+    if let (Some(reference_amount), Some(reference_unit)) = (
+        row.label_reference_amount,
+        row.label_reference_unit.as_deref(),
+    ) {
         if reference_amount > 0.0 && reference_unit == row.unit {
             return ResolvedReference {
                 reference_daily_amount: Some(reference_amount),

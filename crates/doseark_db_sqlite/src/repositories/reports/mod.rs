@@ -1,3 +1,5 @@
+//! Udostępnianie raportów i trendów dziennych
+
 mod daily;
 mod mapping;
 mod trend;
