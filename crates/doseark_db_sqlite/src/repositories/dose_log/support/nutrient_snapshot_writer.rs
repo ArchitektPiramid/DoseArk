@@ -111,6 +111,31 @@ pub(in crate::repositories::dose_log) async fn insert_dose_log_nutrient_snapshot
     Ok(())
 }
 
+/// Scale original amounts without replacing historical nutrient metadata
+/// The ratio refers to the recorded unit count, not the current product recipe
+pub(in crate::repositories::dose_log) async fn rescale_dose_log_nutrient_snapshots(
+    tx: &mut Transaction<'_, Sqlite>,
+    dose_log_id: Uuid,
+    units_ratio: f64,
+) -> ApplicationResult<()> {
+    sqlx::query(
+        r#"
+        UPDATE dose_log_nutrients
+        SET
+            amount = amount * ?2,
+            percent_of_reference = percent_of_reference * ?2
+        WHERE dose_log_id = ?1
+        "#,
+    )
+    .bind(dose_log_id.to_string())
+    .bind(units_ratio)
+    .execute(&mut **tx)
+    .await
+    .map_err(|err| ApplicationError::Repository(err.to_string()))?;
+
+    Ok(())
+}
+
 /// Reference value and its source after resolving overrides
 struct ResolvedReference {
     reference_daily_amount: Option<f64>,

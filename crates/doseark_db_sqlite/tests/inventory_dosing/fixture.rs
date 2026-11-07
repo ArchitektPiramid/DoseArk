@@ -20,6 +20,7 @@ pub(super) struct Fixture {
     pool: SqlitePool,
     pub repos: InventoryDosingRepositoryBundle,
     pub product_id: Uuid,
+    pub nutrient_id: Uuid,
     pub lot_id: Uuid,
 }
 
@@ -164,6 +165,7 @@ impl Fixture {
             pool,
             repos,
             product_id: product.id,
+            nutrient_id: nutrient.id,
             lot_id: lot.id,
         }
     }
@@ -257,6 +259,29 @@ impl Fixture {
                 },
             )
             .await
+    }
+
+    /// Changes the live product recipe; old dose snapshots should remain historical
+    pub async fn replace_composition(&self, amount: f64) {
+        let storage = SqliteStorage::new(self.pool.clone(), self.path.display().to_string());
+        storage
+            .catalog_repositories()
+            .product_nutrients
+            .replace_product_nutrients(
+                self.product_id,
+                vec![SaveProductNutrientInput {
+                    nutrient_id: self.nutrient_id,
+                    amount_per_serving: amount,
+                    unit: "mg".into(),
+                    label_daily_value_percent: None,
+                    label_reference_amount: None,
+                    label_reference_unit: None,
+                    source: "manual".into(),
+                    notes: None,
+                }],
+            )
+            .await
+            .expect("test composition should update");
     }
 
     pub async fn remaining(&self) -> f64 {

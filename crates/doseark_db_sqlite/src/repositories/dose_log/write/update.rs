@@ -6,12 +6,16 @@ use doseark_domain::{DoseLog, UpdateDoseLogInput};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use super::super::support::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
+use super::super::support::nutrient_snapshot_writer::{
+    insert_dose_log_nutrient_snapshots, rescale_dose_log_nutrient_snapshots,
+};
 use super::super::support::queries::{get_dose_log, update_dose_log_row};
 use super::super::support::serving::validated_multiplier_for_product;
 use super::super::support::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
 use crate::repositories::inventory_lot::normalize_stock_quantity;
-use crate::repositories::stock_movement::writer::{insert_stock_movement, InsertStockMovementInput};
+use crate::repositories::stock_movement::writer::{
+    insert_stock_movement, InsertStockMovementInput,
+};
 use crate::repositories::transaction::begin_immediate;
 
 /// Reverses the old stock usage before applying the edited dose
@@ -51,68 +55,93 @@ pub(in crate::repositories::dose_log) async fn update_dose_log(
     )
     .await?;
 
-    if let Some(previous_lot_id) = previous.inventory_lot_id_uuid() {
-        let previous_lot = get_lot(&mut tx, previous_lot_id).await?;
-        let quantity_after = normalize_stock_quantity(
-            previous_lot.units_remaining + previous.units_taken,
-        );
+    // Metadata-only edits do not consume stock again or alter its status
+    let stock_unchanged = previous.inventory_lot_id_uuid() == input.inventory_lot_id
+        && previous.product_id_uuid() == input.product_id
+        && previous.units_taken == input.units_taken;
+    if previous.product_id_uuid() == input.product_id && previous.units_taken == input.units_taken {
+        // Keep the historical serving fraction when the product definition changed later
+        input.serving_multiplier = previous.serving_multiplier;
+    }
 
-        update_lot_stock(&mut tx, previous_lot.id_uuid(), quantity_after).await?;
+    if !stock_unchanged {
+        if let Some(previous_lot_id) = previous.inventory_lot_id_uuid() {
+            let previous_lot = get_lot(&mut tx, previous_lot_id).await?;
+            let quantity_after =
+                normalize_stock_quantity(previous_lot.units_remaining + previous.units_taken);
 
-        insert_stock_movement(
-            &mut tx,
-            InsertStockMovementInput {
-                inventory_lot_id: previous_lot.id_uuid(),
-                product_id: previous_lot.product_id_uuid(),
-                dose_log_id: Some(previous.id_uuid()),
-                movement_type: "correction",
-                quantity_delta: previous.units_taken,
-                quantity_after,
-                reason: "dose_log_update_reversal",
-                notes: previous.notes.clone(),
-            },
-        )
-        .await?;
+            update_lot_stock(&mut tx, previous_lot.id_uuid(), quantity_after).await?;
+
+            insert_stock_movement(
+                &mut tx,
+                InsertStockMovementInput {
+                    inventory_lot_id: previous_lot.id_uuid(),
+                    product_id: previous_lot.product_id_uuid(),
+                    dose_log_id: Some(previous.id_uuid()),
+                    movement_type: "correction",
+                    quantity_delta: previous.units_taken,
+                    quantity_after,
+                    reason: "dose_log_update_reversal",
+                    notes: previous.notes.clone(),
+                },
+            )
+            .await?;
+        }
     }
 
     let row = update_dose_log_row(&mut tx, id, input, now).await?;
 
-    if let Some(new_lot_id) = row.inventory_lot_id_uuid() {
-        let new_lot = get_lot(&mut tx, new_lot_id).await?;
-        validate_lot_for_dose(Some(&new_lot), row.product_id_uuid(), row.units_taken)?;
+    if !stock_unchanged {
+        if let Some(new_lot_id) = row.inventory_lot_id_uuid() {
+            let new_lot = get_lot(&mut tx, new_lot_id).await?;
+            validate_lot_for_dose(Some(&new_lot), row.product_id_uuid(), row.units_taken)?;
 
-        let quantity_after = normalize_stock_quantity(new_lot.units_remaining - row.units_taken);
-        update_lot_stock(&mut tx, new_lot.id_uuid(), quantity_after).await?;
+            let quantity_after =
+                normalize_stock_quantity(new_lot.units_remaining - row.units_taken);
+            update_lot_stock(&mut tx, new_lot.id_uuid(), quantity_after).await?;
 
-        insert_stock_movement(
+            insert_stock_movement(
+                &mut tx,
+                InsertStockMovementInput {
+                    inventory_lot_id: new_lot.id_uuid(),
+                    product_id: new_lot.product_id_uuid(),
+                    dose_log_id: Some(row.id_uuid()),
+                    movement_type: "dose",
+                    quantity_delta: -row.units_taken,
+                    quantity_after,
+                    reason: "dose_log_update_apply",
+                    notes: row.notes.clone(),
+                },
+            )
+            .await?;
+        }
+    }
+
+    if previous.product_id_uuid() == row.product_id_uuid() {
+        if previous.units_taken != row.units_taken {
+            // The original composition is scaled, not reread from the edited product
+            rescale_dose_log_nutrient_snapshots(
+                &mut tx,
+                row.id_uuid(),
+                row.units_taken / previous.units_taken,
+            )
+            .await?;
+        }
+    } else {
+        sqlx::query("DELETE FROM dose_log_nutrients WHERE dose_log_id = ?1")
+            .bind(row.id.0.to_string())
+            .execute(&mut *tx)
+            .await
+            .map_err(|err| ApplicationError::Repository(err.to_string()))?;
+
+        insert_dose_log_nutrient_snapshots(
             &mut tx,
-            InsertStockMovementInput {
-                inventory_lot_id: new_lot.id_uuid(),
-                product_id: new_lot.product_id_uuid(),
-                dose_log_id: Some(row.id_uuid()),
-                movement_type: "dose",
-                quantity_delta: -row.units_taken,
-                quantity_after,
-                reason: "dose_log_update_apply",
-                notes: row.notes.clone(),
-            },
+            row.id_uuid(),
+            row.product_id_uuid(),
+            row.serving_multiplier,
         )
         .await?;
     }
-
-    sqlx::query("DELETE FROM dose_log_nutrients WHERE dose_log_id = ?1")
-        .bind(row.id.0.to_string())
-        .execute(&mut *tx)
-        .await
-        .map_err(|err| ApplicationError::Repository(err.to_string()))?;
-
-    insert_dose_log_nutrient_snapshots(
-        &mut tx,
-        row.id_uuid(),
-        row.product_id_uuid(),
-        row.serving_multiplier,
-    )
-    .await?;
 
     tx.commit()
         .await
