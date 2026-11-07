@@ -10,6 +10,8 @@ mod fixture;
 mod history;
 #[path = "inventory_dosing/lot_identity.rs"]
 mod lot_identity;
+#[path = "inventory_dosing/lot_status.rs"]
+mod lot_status;
 #[path = "inventory_dosing/serving.rs"]
 mod serving;
 #[path = "inventory_dosing/update.rs"]

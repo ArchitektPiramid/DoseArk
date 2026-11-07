@@ -14,7 +14,7 @@ pub(in crate::repositories::dose_log) async fn get_lot(
 ) -> ApplicationResult<DoseInventoryLotRow> {
     sqlx::query_as::<_, DoseInventoryLotRow>(
         r#"
-        SELECT id, product_id, units_remaining
+        SELECT id, product_id, units_remaining, status
         FROM inventory_lots
         WHERE id = ?1
         "#,
@@ -39,6 +39,13 @@ pub(in crate::repositories::dose_log) fn validate_lot_for_dose(
     if lot.product_id_uuid() != product_id {
         return Err(ApplicationError::Validation(
             "Selected inventory lot belongs to another product".into(),
+        ));
+    }
+
+    // Reserve, held and archived stock must be activated before new consumption
+    if lot.status != "active" {
+        return Err(ApplicationError::Validation(
+            "Only active inventory lots can be used for a new dose".into(),
         ));
     }
 

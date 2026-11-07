@@ -118,6 +118,7 @@ pub(super) struct DoseInventoryLotRow {
     pub(super) id: SqliteUuid,
     pub(super) product_id: SqliteUuid,
     pub(super) units_remaining: f64,
+    pub(super) status: String,
 }
 
 impl DoseInventoryLotRow {
