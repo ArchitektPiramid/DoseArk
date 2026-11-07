@@ -3,6 +3,7 @@
 mod days;
 mod events;
 mod options;
+mod range;
 
 use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendReport, NutrientTrendReportInput};

@@ -8,12 +8,14 @@ use doseark_domain::{NutrientTrendDay, NutrientTrendReportInput};
 use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendDaySql};
+use super::range::query_bounds;
 
 /// load the day totals for either one product or one nutrient
 pub(super) async fn load(
     pool: &SqlitePool,
     input: &NutrientTrendReportInput,
 ) -> ApplicationResult<Vec<NutrientTrendDay>> {
+    let (start_at, end_at) = query_bounds(input)?;
     let days = if let Some(product_id) = input.product_id {
         let unit = input.unit.as_deref().unwrap_or("unit");
         let day_sql = sqlx::query_as::<_, NutrientTrendDaySql>(
@@ -44,8 +46,8 @@ pub(super) async fn load(
             ORDER BY date ASC
             "#,
         )
-        .bind(input.start_at)
-        .bind(input.end_at)
+        .bind(start_at)
+        .bind(end_at)
         .bind(product_id.to_string())
         .bind(unit)
         .bind(input.timezone_offset_minutes)
@@ -101,8 +103,8 @@ pub(super) async fn load(
                     ORDER BY date ASC
                     "#,
                 )
-                .bind(input.start_at)
-                .bind(input.end_at)
+                .bind(start_at)
+                .bind(end_at)
                 .bind(nutrient_id.to_string())
                 .bind(unit)
                 .bind(input.timezone_offset_minutes)

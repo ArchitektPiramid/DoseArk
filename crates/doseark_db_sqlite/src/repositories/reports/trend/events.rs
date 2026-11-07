@@ -1,21 +1,18 @@
 //! Szczegóły zdarzeń dawkowania w raportach trendów
 
-use chrono::Duration;
 use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendEvent, NutrientTrendReportInput};
 use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendEventSql};
+use super::range::query_bounds;
 
 /// load individual dose events for the selected trend
 pub(super) async fn load(
     pool: &SqlitePool,
     input: &NutrientTrendReportInput,
 ) -> ApplicationResult<Vec<NutrientTrendEvent>> {
-    // Shift event bounds to match the configured day start
-    let event_range_shift = Duration::hours(i64::from(input.day_start_hour));
-    let event_start_at = input.start_at - event_range_shift;
-    let event_end_at = input.end_at - event_range_shift;
+    let (event_start_at, event_end_at) = query_bounds(input)?;
 
     let events = if let Some(product_id) = input.product_id {
         let event_sql = sqlx::query_as::<_, NutrientTrendEventSql>(

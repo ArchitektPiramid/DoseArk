@@ -1,20 +1,19 @@
+#[path = "reports/boundaries.rs"]
+mod boundaries;
+
 use chrono::{DateTime, NaiveDate, Utc};
+use doseark_db_sqlite::{create_sqlite_pool, run_migrations, SqliteStorage, SqliteStorageConfig};
 use doseark_domain::{
     CreateBrandInput, CreateDoseLogInput, CreateInventoryLotInput, CreateNutrientInput,
     CreateProductInput, DailyIntakeReportInput, DosageForm, InventoryLotStatus, NutrientKind,
     NutrientTrendReportInput, ProductCategory, SaveProductNutrientInput,
 };
-use doseark_db_sqlite::{
-    create_sqlite_pool, run_migrations, SqliteStorage, SqliteStorageConfig,
-};
 use uuid::Uuid;
 
 #[tokio::test]
 async fn sqlite_reports_match_daily_and_trend_boundaries() {
-    let database_path = std::env::temp_dir().join(format!(
-        "doseark-sqlite-reports-{}.db",
-        Uuid::new_v4()
-    ));
+    let database_path =
+        std::env::temp_dir().join(format!("doseark-sqlite-reports-{}.db", Uuid::new_v4()));
     let config = SqliteStorageConfig::new(&database_path);
     let pool = create_sqlite_pool(&config)
         .await
@@ -218,7 +217,10 @@ async fn sqlite_reports_match_daily_and_trend_boundaries() {
     assert_eq!(product_trend.events[0].amount, 1.0);
     assert_eq!(product_trend.events[1].amount, 2.0);
     assert_eq!(product_trend.events[0].product_id, product.id);
-    assert_eq!(product_trend.events[0].product_name, "DoseArk Reports Product");
+    assert_eq!(
+        product_trend.events[0].product_name,
+        "DoseArk Reports Product"
+    );
 
     pool.close().await;
     remove_sqlite_files(&database_path);

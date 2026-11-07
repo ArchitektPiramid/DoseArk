@@ -5,12 +5,14 @@ use doseark_domain::{NutrientTrendOption, NutrientTrendReportInput};
 use sqlx::SqlitePool;
 
 use super::super::{map_sqlx_error, mapping::NutrientTrendOptionSql};
+use super::range::query_bounds;
 
 /// Fetch nutrient choices available within the selected date range
 pub(super) async fn load(
     pool: &SqlitePool,
     input: &NutrientTrendReportInput,
 ) -> ApplicationResult<Vec<NutrientTrendOption>> {
+    let (start_at, end_at) = query_bounds(input)?;
     let nutrients = if input.product_id.is_none() {
         let option_sql = sqlx::query_as::<_, NutrientTrendOptionSql>(
             r#"
@@ -44,8 +46,8 @@ pub(super) async fn load(
                 dln.unit ASC
             "#,
         )
-        .bind(input.start_at)
-        .bind(input.end_at)
+        .bind(start_at)
+        .bind(end_at)
         .bind(input.timezone_offset_minutes)
         .bind(i32::from(input.day_start_hour))
         .fetch_all(pool)
