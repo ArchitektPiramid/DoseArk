@@ -1,14 +1,17 @@
 //! Date-bucketed trend values and zero-filled missing days.
 
-use std::collections::BTreeMap;
 use chrono::Days;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{NutrientTrendDay, NutrientTrendReportInput};
 use sqlx::PgPool;
+use std::collections::BTreeMap;
 
 use super::super::mapping::NutrientTrendDaySql;
 
-pub(super) async fn load_days(pool: &PgPool, input: &NutrientTrendReportInput) -> ApplicationResult<Vec<NutrientTrendDay>> {
+pub(super) async fn load_days(
+    pool: &PgPool,
+    input: &NutrientTrendReportInput,
+) -> ApplicationResult<Vec<NutrientTrendDay>> {
     let days = if let Some(product_id) = input.product_id {
         let unit = input.unit.as_deref().unwrap_or("unit");
         let day_sql = sqlx::query_as::<_, NutrientTrendDaySql>(

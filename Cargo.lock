@@ -368,6 +368,7 @@ dependencies = [
  "doseark_application",
  "doseark_domain",
  "sqlx",
+ "tokio",
  "tracing",
  "uuid",
 ]

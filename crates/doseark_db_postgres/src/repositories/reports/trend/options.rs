@@ -6,7 +6,10 @@ use sqlx::PgPool;
 
 use super::super::mapping::NutrientTrendOptionSql;
 
-pub(super) async fn load_options(pool: &PgPool, input: &NutrientTrendReportInput) -> ApplicationResult<Vec<NutrientTrendOption>> {
+pub(super) async fn load_options(
+    pool: &PgPool,
+    input: &NutrientTrendReportInput,
+) -> ApplicationResult<Vec<NutrientTrendOption>> {
     let nutrients = if input.product_id.is_none() {
         let option_sql = sqlx::query_as::<_, NutrientTrendOptionSql>(
             r#"

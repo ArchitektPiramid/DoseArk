@@ -34,6 +34,7 @@ pub(super) async fn update_inventory_lot(
         .map_err(|err| ApplicationError::Repository(err.to_string()))?;
 
     let previous = select_inventory_lot_for_update(&mut tx, id).await?;
+    validate_lot_product_identity(previous.product_id, input.product_id)?;
     let row = update_inventory_lot_row(&mut tx, id, input, now).await?;
     let delta = normalize_stock_quantity(row.units_remaining - previous.units_remaining);
 
@@ -67,4 +68,27 @@ pub(super) async fn update_inventory_lot(
     tracing::info!(lot_id = %row.id, "Inventory lot updated");
 
     InventoryLot::try_from(row)
+}
+
+/// Keep a lot tied to the product recorded in its stock and dosing history.
+fn validate_lot_product_identity(existing: Uuid, requested: Uuid) -> ApplicationResult<()> {
+    if existing != requested {
+        return Err(ApplicationError::Validation(
+            "Inventory lot product cannot be changed after creation".into(),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::validate_lot_product_identity;
+    use uuid::Uuid;
+
+    #[test]
+    fn lot_product_identity_is_immutable() {
+        let product_id = Uuid::new_v4();
+        assert!(validate_lot_product_identity(product_id, product_id).is_ok());
+        assert!(validate_lot_product_identity(product_id, Uuid::new_v4()).is_err());
+    }
 }

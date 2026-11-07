@@ -7,7 +7,10 @@ use sqlx::PgPool;
 
 use super::super::mapping::NutrientTrendEventSql;
 
-pub(super) async fn load_events(pool: &PgPool, input: &NutrientTrendReportInput) -> ApplicationResult<Vec<NutrientTrendEvent>> {
+pub(super) async fn load_events(
+    pool: &PgPool,
+    input: &NutrientTrendReportInput,
+) -> ApplicationResult<Vec<NutrientTrendEvent>> {
     let event_range_shift = Duration::hours(i64::from(input.day_start_hour));
     let event_start_at = input.start_at - event_range_shift;
     let event_end_at = input.end_at - event_range_shift;

@@ -198,3 +198,26 @@ fn resolve_reference(row: &ProductNutrientSnapshotSourceRow, amount: f64) -> Res
         percent_of_reference: None,
     }
 }
+
+/// Scale saved amounts without replacing the dose-time nutrient metadata.
+/// The ratio is based on recorded units, independent of the current product recipe.
+pub(in crate::repositories::dose_log) async fn rescale_dose_log_nutrient_snapshots(
+    tx: &mut Transaction<'_, Postgres>,
+    dose_log_id: Uuid,
+    units_ratio: f64,
+) -> ApplicationResult<()> {
+    sqlx::query(
+        r#"
+        UPDATE dose_log_nutrients
+        SET amount = amount * $2,
+            percent_of_reference = percent_of_reference * $2
+        WHERE dose_log_id = $1
+        "#,
+    )
+    .bind(dose_log_id)
+    .bind(units_ratio)
+    .execute(&mut **tx)
+    .await
+    .map_err(|err| ApplicationError::Repository(err.to_string()))?;
+    Ok(())
+}

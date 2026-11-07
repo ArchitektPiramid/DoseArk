@@ -11,7 +11,10 @@ use doseark_application::ApplicationResult;
 use doseark_domain::{NutrientTrendReport, NutrientTrendReportInput};
 use sqlx::PgPool;
 
-pub(super) async fn get_nutrient_trend_report(pool: &PgPool, input: NutrientTrendReportInput) -> ApplicationResult<NutrientTrendReport> {
+pub(super) async fn get_nutrient_trend_report(
+    pool: &PgPool,
+    input: NutrientTrendReportInput,
+) -> ApplicationResult<NutrientTrendReport> {
     tracing::trace!(
         start_date = %input.start_date,
         end_date = %input.end_date,

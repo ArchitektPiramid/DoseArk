@@ -9,7 +9,9 @@ use uuid::Uuid;
 use super::super::mapping::DoseLogRow;
 use super::super::support::insert_dose_log_nutrient_snapshots;
 use super::super::support::validated_multiplier_for_product;
-use super::super::support::{get_lot_for_update, normalize_stock_quantity, update_lot_stock};
+use super::super::support::{
+    get_lot_for_update, normalize_stock_quantity, update_lot_stock, validate_lot_for_dose,
+};
 use crate::repositories::stock_movement::writer::{
     insert_stock_movement, InsertStockMovementInput,
 };
@@ -52,17 +54,7 @@ pub(in crate::repositories::dose_log) async fn create_dose_log(
     };
 
     if let Some(lot) = &lot_row {
-        if lot.product_id != input.product_id {
-            return Err(ApplicationError::Validation(
-                "Selected inventory lot belongs to another product".into(),
-            ));
-        }
-
-        if lot.units_remaining < input.units_taken {
-            return Err(ApplicationError::Validation(
-                "Not enough stock in selected inventory lot".into(),
-            ));
-        }
+        validate_lot_for_dose(lot, input.product_id, input.units_taken)?;
     }
 
     let row = sqlx::query_as::<_, DoseLogRow>(
