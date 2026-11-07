@@ -1,3 +1,5 @@
+//! Product catalog HTTP routes for listing, creating and updating products.
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -5,16 +7,11 @@ use axum::{
     Json, Router,
 };
 use doseark_domain::{CreateProductInput, Product, UpdateProductInput};
-use serde::Serialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use super::error::{map_application_error, ApiError};
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -27,7 +24,8 @@ async fn list_products(
     State(state): State<AppState>,
 ) -> Result<Json<Vec<Product>>, (StatusCode, Json<ApiError>)> {
     state
-        .services.products
+        .services
+        .products
         .list_products()
         .await
         .map(Json)
@@ -39,7 +37,8 @@ async fn create_product(
     Json(input): Json<CreateProductInput>,
 ) -> Result<(StatusCode, Json<Product>), (StatusCode, Json<ApiError>)> {
     let product = state
-        .services.products
+        .services
+        .products
         .create_product(input)
         .await
         .map_err(map_application_error)?;
@@ -59,25 +58,10 @@ async fn update_product(
     );
 
     state
-        .services.products
+        .services
+        .products
         .update_product(product_id, input)
         .await
         .map(Json)
         .map_err(map_application_error)
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
-        }),
-    )
 }

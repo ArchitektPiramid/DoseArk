@@ -1,3 +1,5 @@
+//! Brand catalog HTTP routes and application error handling.
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -5,16 +7,11 @@ use axum::{
     Json, Router,
 };
 use doseark_domain::{Brand, CreateBrandInput, UpdateBrandInput};
-use serde::Serialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use super::error::{map_application_error, ApiError};
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -29,7 +26,8 @@ async fn list_brands(
     tracing::debug!("API handler started: list brands");
 
     state
-        .services.brands
+        .services
+        .brands
         .list_brands()
         .await
         .map(Json)
@@ -43,7 +41,8 @@ async fn create_brand(
     tracing::debug!(brand_name = %input.name, "API handler started: create brand");
 
     let brand = state
-        .services.brands
+        .services
+        .brands
         .create_brand(input)
         .await
         .map_err(map_application_error)?;
@@ -59,25 +58,10 @@ async fn update_brand(
     tracing::debug!(brand_id = %brand_id, brand_name = %input.name, "API handler started: update brand");
 
     state
-        .services.brands
+        .services
+        .brands
         .update_brand(brand_id, input)
         .await
         .map(Json)
         .map_err(map_application_error)
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
-        }),
-    )
 }

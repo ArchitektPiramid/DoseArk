@@ -1,3 +1,7 @@
+//! Runtime profile configuration and validation HTTP routes.
+
+use super::error::ApiError;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -5,28 +9,20 @@ use axum::{
     Json, Router,
 };
 use doseark_contracts::{
-    ProfileValidationCheckResponse, ProfileValidationResponse, RuntimeConfigurationResponse,
-    RuntimeConfigValueResponse, RuntimeEnvironmentVariableResponse,
+    ProfileValidationCheckResponse, ProfileValidationResponse, RuntimeConfigValueResponse,
+    RuntimeConfigurationResponse, RuntimeEnvironmentVariableResponse,
 };
 use doseark_runtime_config::{load_profiles, CredentialsResolver};
-use serde::Serialize;
 
-use crate::{
-    config::ConfigValueSource,
-    profile_validation::validate_profile,
-    state::AppState,
-};
-
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use crate::{config::ConfigValueSource, profile_validation::validate_profile, state::AppState};
 
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/admin/runtime/config", get(runtime_configuration))
-        .route("/api/admin/profiles/{profile_id}/validate", get(validate_profile_route))
+        .route(
+            "/api/admin/profiles/{profile_id}/validate",
+            get(validate_profile_route),
+        )
 }
 
 async fn runtime_configuration(
@@ -35,7 +31,10 @@ async fn runtime_configuration(
     let config = &state.config;
 
     Json(RuntimeConfigurationResponse {
-        env_file: config.env_file.as_ref().map(|path| path.display().to_string()),
+        env_file: config
+            .env_file
+            .as_ref()
+            .map(|path| path.display().to_string()),
         environment_variables: config
             .visible_environment_variables()
             .into_iter()
@@ -48,10 +47,7 @@ async fn runtime_configuration(
             config.storage_backend.as_str().to_string(),
             &config.sources.storage_backend,
         ),
-        database_target: value_response(
-            config.database_target(),
-            &config.sources.database_target,
-        ),
+        database_target: value_response(config.database_target(), &config.sources.database_target),
         backup_dir: value_response(
             config.backup_dir.display().to_string(),
             &config.sources.backup_dir,
@@ -110,10 +106,7 @@ fn value_response(value: String, source: &ConfigValueSource) -> RuntimeConfigVal
     }
 }
 
-fn internal_error(
-    code: &'static str,
-    message: String,
-) -> (StatusCode, Json<ApiError>) {
+fn internal_error(code: &'static str, message: String) -> (StatusCode, Json<ApiError>) {
     tracing::warn!(code, message, "Profile admin request failed");
     (
         StatusCode::INTERNAL_SERVER_ERROR,

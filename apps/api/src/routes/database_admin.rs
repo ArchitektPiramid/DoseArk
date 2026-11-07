@@ -1,17 +1,14 @@
+//! Database diagnostics HTTP routes for administrative status views.
+
 use axum::{extract::State, http::StatusCode, routing::get, Json, Router};
 use doseark_application::{ApplicationError, DATABASE_SCHEMA_VERSION, EXPECTED_MIGRATION_REVISION};
 use doseark_contracts::{
     DatabaseOverviewResponse, DatabaseTableStatsResponse, StorageCapabilitiesResponse,
 };
-use serde::Serialize;
 
 use crate::state::AppState;
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use super::error::ApiError;
 
 pub fn router() -> Router<AppState> {
     Router::new()

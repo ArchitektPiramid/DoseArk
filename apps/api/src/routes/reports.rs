@@ -1,3 +1,5 @@
+//! Daily intake and nutrient trend HTTP routes.
+
 use axum::{
     extract::{Query, State},
     http::StatusCode,
@@ -8,10 +10,12 @@ use chrono::{DateTime, Duration, NaiveDate, Utc};
 use doseark_domain::{
     DailyIntakeReport, DailyIntakeReportInput, NutrientTrendReport, NutrientTrendReportInput,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
+
+use super::error::{map_application_error, ApiError};
 
 #[derive(Debug, Deserialize)]
 struct DailyIntakeReportQuery {
@@ -30,16 +34,13 @@ struct NutrientTrendReportQuery {
     unit: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
-
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/reports/daily-intake", get(get_daily_intake_report))
-        .route("/api/reports/nutrient-trend", get(get_nutrient_trend_report))
+        .route(
+            "/api/reports/nutrient-trend",
+            get(get_nutrient_trend_report),
+        )
 }
 
 async fn get_daily_intake_report(
@@ -56,7 +57,8 @@ async fn get_daily_intake_report(
     );
 
     state
-        .services.reports
+        .services
+        .reports
         .get_daily_intake_report(input)
         .await
         .map(Json)
@@ -82,7 +84,8 @@ async fn get_nutrient_trend_report(
     );
 
     state
-        .services.reports
+        .services
+        .reports
         .get_nutrient_trend_report(input)
         .await
         .map(Json)
@@ -208,22 +211,6 @@ fn bad_request(message: String) -> (StatusCode, Json<ApiError>) {
         Json(ApiError {
             code: "BAD_REQUEST",
             message,
-        }),
-    )
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
         }),
     )
 }
