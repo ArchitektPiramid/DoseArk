@@ -1,7 +1,9 @@
+//! Mapowanie danych partii z SQLite na typy domenowe
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::{DateTime, NaiveDate, Utc};
 use doseark_application::ApplicationError;
 use doseark_domain::{InventoryLot, InventoryLotStatus};
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct InventoryLotRow {
@@ -22,7 +24,6 @@ pub(super) struct InventoryLotRow {
     pub(super) created_at: DateTime<Utc>,
     pub(super) updated_at: DateTime<Utc>,
 }
-
 
 impl InventoryLotRow {
     pub(super) fn id_uuid(&self) -> uuid::Uuid {

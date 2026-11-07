@@ -1,11 +1,14 @@
+//! Mapowanie rekordów raportów i trendów z SQLite
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::{NaiveDate, Utc};
 use doseark_application::ApplicationError;
 use doseark_domain::{
     DailyIntakeReportRow, DoseLog, DoseLogStatus, NutrientKind, NutrientTrendDay,
     NutrientTrendEvent, NutrientTrendOption,
 };
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
+/// Daily nutrient totals returned by the SQLite aggregate
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct DailyIntakeReportRowSql {
     pub(super) nutrient_id: SqliteUuid,
@@ -49,6 +52,7 @@ impl TryFrom<DailyIntakeReportRowSql> for DailyIntakeReportRow {
     }
 }
 
+/// nutrient choices and counts for a trend filter
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct NutrientTrendOptionSql {
     pub(super) nutrient_id: SqliteUuid,
@@ -89,6 +93,7 @@ impl TryFrom<NutrientTrendOptionSql> for NutrientTrendOption {
     }
 }
 
+/// One intake event with its product and lot labels
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct NutrientTrendEventSql {
     pub(super) dose_log_id: SqliteUuid,
@@ -122,6 +127,7 @@ impl From<NutrientTrendEventSql> for NutrientTrendEvent {
     }
 }
 
+/// aggregated amounts and reference values for one day
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct NutrientTrendDaySql {
     pub(super) date: NaiveDate,
@@ -155,6 +161,7 @@ impl TryFrom<NutrientTrendDaySql> for NutrientTrendDay {
     }
 }
 
+/// Dose fields included in daily report details
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct ReportDoseLogRow {
     pub(super) id: SqliteUuid,
@@ -215,6 +222,7 @@ fn dose_log_status_from_db(value: &str) -> Result<DoseLogStatus, ApplicationErro
     }
 }
 
+/// Convert a stored nutrient kind to its domain variant
 pub(super) fn nutrient_kind_from_db(value: &str) -> Result<NutrientKind, ApplicationError> {
     match value {
         "vitamin" => Ok(NutrientKind::Vitamin),

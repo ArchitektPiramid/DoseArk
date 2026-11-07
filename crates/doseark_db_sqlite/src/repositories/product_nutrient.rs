@@ -1,10 +1,12 @@
+//! Lista i podmiana składu produktu
+
+use crate::sqlite_types::{into_uuid, SqliteUuid};
 use async_trait::async_trait;
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult, ProductNutrientRepository};
 use doseark_domain::{ProductNutrient, SaveProductNutrientInput};
 use sqlx::SqlitePool;
 use uuid::Uuid;
-use crate::sqlite_types::{into_uuid, SqliteUuid};
 
 #[derive(Clone)]
 pub struct SqliteProductNutrientRepository {
@@ -19,7 +21,10 @@ impl SqliteProductNutrientRepository {
 
 #[async_trait]
 impl ProductNutrientRepository for SqliteProductNutrientRepository {
-    async fn list_product_nutrients(&self, product_id: Uuid) -> ApplicationResult<Vec<ProductNutrient>> {
+    async fn list_product_nutrients(
+        &self,
+        product_id: Uuid,
+    ) -> ApplicationResult<Vec<ProductNutrient>> {
         tracing::trace!(
             product_id = %product_id,
             "DB query started: list product nutrients",
@@ -59,6 +64,7 @@ impl ProductNutrientRepository for SqliteProductNutrientRepository {
         Ok(rows.into_iter().map(ProductNutrient::from).collect())
     }
 
+    /// Replaces the full composition in one transaction
     async fn replace_product_nutrients(
         &self,
         product_id: Uuid,

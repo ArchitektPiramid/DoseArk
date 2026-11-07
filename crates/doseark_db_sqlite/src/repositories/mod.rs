@@ -1,3 +1,5 @@
+//! Wspólny punkt eksportu repozytoriów SQLite
+
 pub mod brand;
 pub mod dose_log;
 pub mod dose_log_nutrient;

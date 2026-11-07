@@ -1,3 +1,5 @@
+//! Odczyt historii zmian stanów magazynowych
+
 mod mapping;
 pub(crate) mod writer;
 
@@ -38,6 +40,7 @@ impl StockMovementRepository for SqliteStockMovementRepository {
         rows.into_iter().map(StockMovement::try_from).collect()
     }
 
+    /// Reads the movement history for a single inventory lot
     async fn list_stock_movements_for_lot(
         &self,
         inventory_lot_id: Uuid,
@@ -81,6 +84,7 @@ impl StockMovementRepository for SqliteStockMovementRepository {
     }
 }
 
+/// SQL shared by full and lot-specific movement history
 fn stock_movement_select_sql() -> &'static str {
     r#"
     SELECT

@@ -5,11 +5,11 @@
 //! movements, dosing, and reports. The adapter can back the complete HTTP API
 //! runtime without a PostgreSQL server.
 
-pub mod diagnostics;
 pub mod backup;
+pub mod diagnostics;
 pub mod repositories;
-pub mod storage;
 mod sqlite_types;
+pub mod storage;
 
 use std::{
     path::{Path, PathBuf},
@@ -21,8 +21,8 @@ use sqlx::{
     SqlitePool,
 };
 
-pub use diagnostics::*;
 pub use backup::*;
+pub use diagnostics::*;
 pub use repositories::*;
 pub use storage::*;
 
@@ -47,8 +47,13 @@ impl SqliteStorageConfig {
     }
 }
 
+/// Opens the local SQLite pool with the configured pragmas
 pub async fn create_sqlite_pool(config: &SqliteStorageConfig) -> Result<SqlitePool, sqlx::Error> {
-    if let Some(parent) = config.path.parent().filter(|path| !path.as_os_str().is_empty()) {
+    if let Some(parent) = config
+        .path
+        .parent()
+        .filter(|path| !path.as_os_str().is_empty())
+    {
         std::fs::create_dir_all(parent).map_err(sqlx::Error::Io)?;
     }
 
@@ -66,6 +71,7 @@ pub async fn create_sqlite_pool(config: &SqliteStorageConfig) -> Result<SqlitePo
         .await
 }
 
+/// Applies pending SQLx migrations without replacing existing data
 pub async fn run_migrations(pool: &SqlitePool) -> Result<(), sqlx::migrate::MigrateError> {
     tracing::info!("Running SQLite migrations");
 

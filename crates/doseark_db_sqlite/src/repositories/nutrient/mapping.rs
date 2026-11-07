@@ -1,7 +1,9 @@
+//! Mapowanie składników i jednostek z bazy danych
+
+use crate::sqlite_types::{into_uuid, SqliteUuid};
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{Nutrient, NutrientKind};
-use crate::sqlite_types::{into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct NutrientRow {

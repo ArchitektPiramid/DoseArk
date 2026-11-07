@@ -1,10 +1,12 @@
+//! Operacje katalogowe na markach produktów
+
+use crate::sqlite_types::{into_uuid, SqliteUuid};
 use async_trait::async_trait;
 use chrono::Utc;
-use doseark_application::{BrandRepository, ApplicationError, ApplicationResult};
+use doseark_application::{ApplicationError, ApplicationResult, BrandRepository};
 use doseark_domain::{Brand, CreateBrandInput, UpdateBrandInput};
 use sqlx::SqlitePool;
 use uuid::Uuid;
-use crate::sqlite_types::{into_uuid, SqliteUuid};
 
 #[derive(Clone)]
 pub struct SqliteBrandRepository {
@@ -38,6 +40,7 @@ impl BrandRepository for SqliteBrandRepository {
         Ok(rows.into_iter().map(Brand::from).collect())
     }
 
+    /// Saves a brand and returns its assigned identifier
     async fn create_brand(&self, input: CreateBrandInput) -> ApplicationResult<Brand> {
         tracing::info!(brand_name = %input.name, "Creating brand");
 
@@ -67,6 +70,7 @@ impl BrandRepository for SqliteBrandRepository {
         Ok(row.into())
     }
 
+    /// Updates brand details without modifying linked products
     async fn update_brand(&self, id: Uuid, input: UpdateBrandInput) -> ApplicationResult<Brand> {
         tracing::info!(brand_id = %id, brand_name = %input.name, "Updating brand");
 

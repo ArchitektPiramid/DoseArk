@@ -1,8 +1,11 @@
+//! Mapowanie rekordów dawek i partii magazynowych na modele domenowe
+
+use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 use chrono::Utc;
 use doseark_application::ApplicationError;
 use doseark_domain::{DoseLog, DoseLogStatus};
-use crate::sqlite_types::{into_optional_uuid, into_uuid, SqliteUuid};
 
+/// Persisted dose fields used by write operations
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct DoseLogRow {
     pub(super) id: SqliteUuid,
@@ -21,7 +24,6 @@ pub(super) struct DoseLogRow {
     pub(super) updated_at: chrono::DateTime<Utc>,
 }
 
-
 impl DoseLogRow {
     pub(super) fn id_uuid(&self) -> uuid::Uuid {
         self.id.0
@@ -36,6 +38,7 @@ impl DoseLogRow {
     }
 }
 
+/// A history row with stock information reconstructed from movements
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct DoseLogHistoryRow {
     pub(super) id: SqliteUuid,
@@ -60,6 +63,7 @@ pub(super) struct DoseLogHistoryRow {
 impl TryFrom<DoseLogRow> for DoseLog {
     type Error = ApplicationError;
 
+    /// Converts database status and identifiers into domain values
     fn try_from(row: DoseLogRow) -> Result<Self, Self::Error> {
         Ok(Self {
             id: into_uuid(row.id),
@@ -114,8 +118,8 @@ pub(super) struct DoseInventoryLotRow {
     pub(super) id: SqliteUuid,
     pub(super) product_id: SqliteUuid,
     pub(super) units_remaining: f64,
+    pub(super) status: String,
 }
-
 
 impl DoseInventoryLotRow {
     pub(super) fn id_uuid(&self) -> uuid::Uuid {

@@ -1,6 +1,8 @@
+//! Mapowanie lokalizacji magazynowych z rekordów SQLite
+
+use crate::sqlite_types::{into_uuid, SqliteUuid};
 use chrono::{DateTime, Utc};
 use doseark_domain::StorageLocation;
-use crate::sqlite_types::{into_uuid, SqliteUuid};
 
 #[derive(Debug, sqlx::FromRow)]
 pub(super) struct StorageLocationRow {

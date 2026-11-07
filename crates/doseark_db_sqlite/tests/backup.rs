@@ -13,15 +13,25 @@ async fn sqlite_backup_contains_committed_data() {
     let backup_path = root.join("backups").join("doseark-backup.sqlite");
 
     let config = SqliteStorageConfig::new(&database_path);
-    let pool = create_sqlite_pool(&config).await.expect("open SQLite database");
+    let pool = create_sqlite_pool(&config)
+        .await
+        .expect("open SQLite database");
     run_migrations(&pool).await.expect("run migrations");
 
-    sqlx::query("INSERT INTO brands (id, name) VALUES (?, ?)")
-        .bind(Uuid::new_v4().to_string())
-        .bind("Backup test")
-        .execute(&pool)
-        .await
-        .expect("insert test row");
+    let now = chrono::Utc::now();
+
+    // Insert a complete brand record before creating the snapshot
+    sqlx::query(
+        "INSERT INTO brands (id, name, created_at, updated_at)
+     VALUES (?1, ?2, ?3, ?4)",
+    )
+    .bind(Uuid::new_v4().to_string())
+    .bind("Backup test")
+    .bind(now)
+    .bind(now)
+    .execute(&pool)
+    .await
+    .expect("insert test row");
 
     let backup_manager = SqliteBackupManager::new(pool.clone());
     backup_manager
