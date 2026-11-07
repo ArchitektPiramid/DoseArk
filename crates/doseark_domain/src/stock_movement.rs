@@ -1,7 +1,10 @@
+//! Zdarzenia zmieniające stan magazynowy partii
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Reason category for a recorded stock movement
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum StockMovementType {
@@ -14,6 +17,7 @@ pub enum StockMovementType {
     Reconcile,
 }
 
+/// A signed stock change and the resulting lot quantity
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StockMovement {
     pub id: Uuid,
@@ -24,7 +28,9 @@ pub struct StockMovement {
     pub occurred_at: DateTime<Utc>,
 
     pub movement_type: StockMovementType,
+    /// Signed change to stock: positive for additions, negative for removals
     pub quantity_delta: f64,
+    /// Lot balance after applying this movement
     pub quantity_after: f64,
 
     pub reason: Option<String>,

@@ -1,4 +1,4 @@
-//! Daily, hourly, and nutrient trend report contracts shared by core and persistence.
+//! Modele raportów dobowych i trendów składników
 
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
@@ -6,22 +6,29 @@ use uuid::Uuid;
 
 use crate::{DoseLog, NutrientKind};
 
+/// UTC interval and display date for a single daily report
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DailyIntakeReportInput {
     pub date: NaiveDate,
+    /// Inclusive UTC boundary of the report window
     pub start_at: DateTime<Utc>,
+    /// Exclusive UTC boundary of the report window
     pub end_at: DateTime<Utc>,
 }
 
+/// Aggregated nutrient intake and contributing dose logs
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DailyIntakeReport {
     pub date: NaiveDate,
+    /// Inclusive UTC boundary of the report window
     pub start_at: DateTime<Utc>,
+    /// Exclusive UTC boundary of the report window
     pub end_at: DateTime<Utc>,
     pub rows: Vec<DailyIntakeReportRow>,
     pub dose_logs: Vec<DoseLog>,
 }
 
+/// One nutrient total within the selected UTC interval
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DailyIntakeReportRow {
     pub nutrient_id: Uuid,
@@ -41,28 +48,37 @@ pub struct DailyIntakeReportRow {
     pub dose_count: u32,
 }
 
+/// Date labels, UTC bounds and filters for trend aggregation
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NutrientTrendReportInput {
     pub start_date: NaiveDate,
     pub end_date: NaiveDate,
+    /// Inclusive UTC boundary of the report window
     pub start_at: DateTime<Utc>,
+    /// Exclusive UTC boundary of the report window
     pub end_at: DateTime<Utc>,
+    /// Local-to-UTC offset in minutes, like JS getTimezoneOffset(); fixed across the range
     pub timezone_offset_minutes: i32,
+    /// Local hour at which a reporting day begins
     pub day_start_hour: u8,
     pub nutrient_id: Option<Uuid>,
     pub product_id: Option<Uuid>,
     pub unit: Option<String>,
 }
 
+/// Trend totals, plotted days and matching intake events
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NutrientTrendReport {
     pub start_date: NaiveDate,
     pub end_date: NaiveDate,
+    /// Inclusive UTC boundary of the report window
     pub start_at: DateTime<Utc>,
+    /// Exclusive UTC boundary of the report window
     pub end_at: DateTime<Utc>,
     pub selected_nutrient_id: Option<Uuid>,
     pub selected_product_id: Option<Uuid>,
     pub selected_unit: Option<String>,
+    /// Local hour at which a reporting day begins
     pub day_start_hour: u8,
     pub nutrients: Vec<NutrientTrendOption>,
     pub days: Vec<NutrientTrendDay>,
@@ -70,6 +86,7 @@ pub struct NutrientTrendReport {
     pub events: Vec<NutrientTrendEvent>,
 }
 
+/// A nutrient available for selection in the report filters
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NutrientTrendOption {
     pub nutrient_id: Uuid,
@@ -82,6 +99,7 @@ pub struct NutrientTrendOption {
     pub recorded_day_count: u32,
 }
 
+/// A recorded dose contributing to the selected trend
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NutrientTrendEvent {
     pub dose_log_id: Uuid,
@@ -97,6 +115,7 @@ pub struct NutrientTrendEvent {
     pub notes: Option<String>,
 }
 
+/// One day of aggregated intake in the selected trend
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NutrientTrendDay {
     pub date: NaiveDate,

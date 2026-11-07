@@ -1,7 +1,10 @@
+//! Składniki odżywcze i ich wartości referencyjne
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// Classification of a catalog nutrient or active substance
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NutrientKind {
@@ -15,6 +18,7 @@ pub enum NutrientKind {
     Other,
 }
 
+/// Canonical and display names with optional reference intake values
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Nutrient {
     pub id: Uuid,
@@ -33,6 +37,7 @@ pub struct Nutrient {
     pub updated_at: DateTime<Utc>,
 }
 
+/// Data required to register a nutrient
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateNutrientInput {
     pub canonical_name: String,
@@ -47,6 +52,7 @@ pub struct CreateNutrientInput {
     pub reference_notes: Option<String>,
 }
 
+/// Editable nutrient details and reference values
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpdateNutrientInput {
     pub canonical_name: String,
@@ -60,18 +66,3 @@ pub struct UpdateNutrientInput {
     pub reference_source: Option<String>,
     pub reference_notes: Option<String>,
 }
-
-// // TODO: remove
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub struct ProductNutrient {
-//     pub id: Uuid,
-//     pub product_id: Uuid,
-//     pub nutrient_id: Uuid,
-//     pub amount_per_serving: f64,
-//     pub unit: String,
-//     pub daily_value_percent: Option<f64>,
-//     pub source: String,
-//     pub notes: Option<String>,
-//     pub created_at: DateTime<Utc>,
-//     pub updated_at: DateTime<Utc>,
-// }

@@ -1,9 +1,12 @@
+//! Historyczne wartości składników zapisanych wraz z dawką
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::NutrientKind;
 
+/// Snapshot of one nutrient captured for a specific intake event
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DoseLogNutrient {
     pub id: Uuid,
@@ -15,6 +18,7 @@ pub struct DoseLogNutrient {
     pub nutrient_display_name: String,
     pub nutrient_kind: NutrientKind,
 
+    /// Amount stored at intake time, independent of later composition edits
     pub amount: f64,
     pub unit: String,
 
