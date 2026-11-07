@@ -1,20 +1,12 @@
 //! Individual recorded intakes corresponding to nutrient or product trend days.
 
-use chrono::Duration;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{NutrientTrendEvent, NutrientTrendReportInput};
 use sqlx::PgPool;
 
 use super::super::mapping::NutrientTrendEventSql;
 
-pub(super) async fn load_events(
-    pool: &PgPool,
-    input: &NutrientTrendReportInput,
-) -> ApplicationResult<Vec<NutrientTrendEvent>> {
-    let event_range_shift = Duration::hours(i64::from(input.day_start_hour));
-    let event_start_at = input.start_at - event_range_shift;
-    let event_end_at = input.end_at - event_range_shift;
-
+pub(super) async fn load_events(pool: &PgPool, input: &NutrientTrendReportInput) -> ApplicationResult<Vec<NutrientTrendEvent>> {
     let events = if let Some(product_id) = input.product_id {
         let event_sql = sqlx::query_as::<_, NutrientTrendEventSql>(
             r#"
@@ -41,8 +33,8 @@ pub(super) async fn load_events(
             ORDER BY dl.taken_at ASC, dl.id ASC
             "#,
         )
-        .bind(event_start_at)
-        .bind(event_end_at)
+        .bind(input.start_at)
+        .bind(input.end_at)
         .bind(product_id)
         .fetch_all(pool)
         .await
@@ -90,8 +82,8 @@ pub(super) async fn load_events(
                     ORDER BY dl.taken_at ASC, dl.id ASC
                     "#,
                 )
-                .bind(event_start_at)
-                .bind(event_end_at)
+                .bind(input.start_at)
+                .bind(input.end_at)
                 .bind(nutrient_id)
                 .bind(unit)
                 .fetch_all(pool)

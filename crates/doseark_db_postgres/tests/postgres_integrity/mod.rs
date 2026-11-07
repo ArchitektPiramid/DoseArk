@@ -1,6 +1,17 @@
 //! Isolated test schemas and shared fixtures for PostgreSQL repository checks.
 
 mod inventory;
+mod reports;
+
+/// Runs the inventory scenarios while keeping fixture modules private.
+pub(super) async fn run_inventory_regressions() -> TestResult<()> {
+    inventory::run().await
+}
+
+/// Runs the report boundary scenarios within a disposable PostgreSQL schema.
+pub(super) async fn run_report_regressions() -> TestResult<()> {
+    reports::run().await
+}
 
 use std::{env, error::Error};
 
@@ -8,11 +19,6 @@ use sqlx::{postgres::PgPoolOptions, PgPool};
 use uuid::Uuid;
 
 pub(super) type TestResult<T> = Result<T, Box<dyn Error + Send + Sync>>;
-
-/// Runs the inventory scenarios without exposing their private fixtures.
-pub(super) async fn run_inventory_and_snapshot_regressions() -> TestResult<()> {
-    inventory::run().await
-}
 
 pub(super) struct TestDatabase {
     pub pool: PgPool,
@@ -46,11 +52,7 @@ impl TestDatabase {
             .await?;
 
         sqlx::migrate!("./migrations").run(&pool).await?;
-        Ok(Self {
-            pool,
-            admin,
-            schema,
-        })
+        Ok(Self { pool, admin, schema })
     }
 
     pub async fn cleanup(self) -> TestResult<()> {
