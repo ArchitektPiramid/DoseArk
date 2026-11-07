@@ -1,0 +1,224 @@
+//! Compile-time checks that reorganizing modules does not break public Rust imports.
+//!
+//! The root type, legacy module and new feature module must resolve to the
+//! same concrete type, not merely expose types with similar names.
+
+macro_rules! assert_paths_match {
+    ($root:ty, $legacy:ty, $grouped:ty $(,)?) => {{
+        fn old_to_new(value: $legacy) -> $grouped {
+            value
+        }
+        let _: fn($root) -> $root = old_to_new;
+    }};
+}
+
+#[test]
+fn catalog_paths_remain_compatible() {
+    assert_paths_match!(
+        doseark_domain::Brand,
+        doseark_domain::brand::Brand,
+        doseark_domain::catalog::brand::Brand,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateBrandInput,
+        doseark_domain::brand::CreateBrandInput,
+        doseark_domain::catalog::brand::CreateBrandInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateBrandInput,
+        doseark_domain::brand::UpdateBrandInput,
+        doseark_domain::catalog::brand::UpdateBrandInput,
+    );
+    assert_paths_match!(
+        doseark_domain::Product,
+        doseark_domain::product::Product,
+        doseark_domain::catalog::product::Product,
+    );
+    assert_paths_match!(
+        doseark_domain::ProductCategory,
+        doseark_domain::product::ProductCategory,
+        doseark_domain::catalog::product::ProductCategory,
+    );
+    assert_paths_match!(
+        doseark_domain::ProductUserImportance,
+        doseark_domain::product::ProductUserImportance,
+        doseark_domain::catalog::product::ProductUserImportance,
+    );
+    assert_paths_match!(
+        doseark_domain::DosageForm,
+        doseark_domain::product::DosageForm,
+        doseark_domain::catalog::product::DosageForm,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateProductInput,
+        doseark_domain::product::CreateProductInput,
+        doseark_domain::catalog::product::CreateProductInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateProductInput,
+        doseark_domain::product::UpdateProductInput,
+        doseark_domain::catalog::product::UpdateProductInput,
+    );
+    assert_paths_match!(
+        doseark_domain::Nutrient,
+        doseark_domain::nutrient::Nutrient,
+        doseark_domain::catalog::nutrient::Nutrient,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientKind,
+        doseark_domain::nutrient::NutrientKind,
+        doseark_domain::catalog::nutrient::NutrientKind,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateNutrientInput,
+        doseark_domain::nutrient::CreateNutrientInput,
+        doseark_domain::catalog::nutrient::CreateNutrientInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateNutrientInput,
+        doseark_domain::nutrient::UpdateNutrientInput,
+        doseark_domain::catalog::nutrient::UpdateNutrientInput,
+    );
+    assert_paths_match!(
+        doseark_domain::ProductNutrient,
+        doseark_domain::product_nutrient::ProductNutrient,
+        doseark_domain::catalog::product_nutrient::ProductNutrient,
+    );
+    assert_paths_match!(
+        doseark_domain::SaveProductNutrientInput,
+        doseark_domain::product_nutrient::SaveProductNutrientInput,
+        doseark_domain::catalog::product_nutrient::SaveProductNutrientInput,
+    );
+}
+
+#[test]
+fn dosing_paths_remain_compatible() {
+    assert_paths_match!(
+        doseark_domain::DoseLog,
+        doseark_domain::dose_log::DoseLog,
+        doseark_domain::dosing::dose_log::DoseLog,
+    );
+    assert_paths_match!(
+        doseark_domain::DoseLogStatus,
+        doseark_domain::dose_log::DoseLogStatus,
+        doseark_domain::dosing::dose_log::DoseLogStatus,
+    );
+    assert_paths_match!(
+        doseark_domain::DoseLogListInput,
+        doseark_domain::dose_log::DoseLogListInput,
+        doseark_domain::dosing::dose_log::DoseLogListInput,
+    );
+    assert_paths_match!(
+        doseark_domain::DoseLogPage,
+        doseark_domain::dose_log::DoseLogPage,
+        doseark_domain::dosing::dose_log::DoseLogPage,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateDoseLogInput,
+        doseark_domain::dose_log::CreateDoseLogInput,
+        doseark_domain::dosing::dose_log::CreateDoseLogInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateDoseLogInput,
+        doseark_domain::dose_log::UpdateDoseLogInput,
+        doseark_domain::dosing::dose_log::UpdateDoseLogInput,
+    );
+    assert_paths_match!(
+        doseark_domain::DoseLogNutrient,
+        doseark_domain::dose_log_nutrient::DoseLogNutrient,
+        doseark_domain::dosing::dose_log_nutrient::DoseLogNutrient,
+    );
+}
+
+#[test]
+fn inventory_paths_remain_compatible() {
+    assert_paths_match!(
+        doseark_domain::InventoryLot,
+        doseark_domain::inventory_lot::InventoryLot,
+        doseark_domain::inventory::inventory_lot::InventoryLot,
+    );
+    assert_paths_match!(
+        doseark_domain::InventoryLotStatus,
+        doseark_domain::inventory_lot::InventoryLotStatus,
+        doseark_domain::inventory::inventory_lot::InventoryLotStatus,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateInventoryLotInput,
+        doseark_domain::inventory_lot::CreateInventoryLotInput,
+        doseark_domain::inventory::inventory_lot::CreateInventoryLotInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateInventoryLotInput,
+        doseark_domain::inventory_lot::UpdateInventoryLotInput,
+        doseark_domain::inventory::inventory_lot::UpdateInventoryLotInput,
+    );
+    assert_paths_match!(
+        doseark_domain::StockMovement,
+        doseark_domain::stock_movement::StockMovement,
+        doseark_domain::inventory::stock_movement::StockMovement,
+    );
+    assert_paths_match!(
+        doseark_domain::StockMovementType,
+        doseark_domain::stock_movement::StockMovementType,
+        doseark_domain::inventory::stock_movement::StockMovementType,
+    );
+    assert_paths_match!(
+        doseark_domain::StorageLocation,
+        doseark_domain::storage_location::StorageLocation,
+        doseark_domain::inventory::storage_location::StorageLocation,
+    );
+    assert_paths_match!(
+        doseark_domain::CreateStorageLocationInput,
+        doseark_domain::storage_location::CreateStorageLocationInput,
+        doseark_domain::inventory::storage_location::CreateStorageLocationInput,
+    );
+    assert_paths_match!(
+        doseark_domain::UpdateStorageLocationInput,
+        doseark_domain::storage_location::UpdateStorageLocationInput,
+        doseark_domain::inventory::storage_location::UpdateStorageLocationInput,
+    );
+}
+
+#[test]
+fn reports_paths_remain_compatible() {
+    assert_paths_match!(
+        doseark_domain::DailyIntakeReportInput,
+        doseark_domain::daily_intake_report::DailyIntakeReportInput,
+        doseark_domain::reports::daily_intake_report::DailyIntakeReportInput,
+    );
+    assert_paths_match!(
+        doseark_domain::DailyIntakeReport,
+        doseark_domain::daily_intake_report::DailyIntakeReport,
+        doseark_domain::reports::daily_intake_report::DailyIntakeReport,
+    );
+    assert_paths_match!(
+        doseark_domain::DailyIntakeReportRow,
+        doseark_domain::daily_intake_report::DailyIntakeReportRow,
+        doseark_domain::reports::daily_intake_report::DailyIntakeReportRow,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientTrendReportInput,
+        doseark_domain::daily_intake_report::NutrientTrendReportInput,
+        doseark_domain::reports::daily_intake_report::NutrientTrendReportInput,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientTrendReport,
+        doseark_domain::daily_intake_report::NutrientTrendReport,
+        doseark_domain::reports::daily_intake_report::NutrientTrendReport,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientTrendOption,
+        doseark_domain::daily_intake_report::NutrientTrendOption,
+        doseark_domain::reports::daily_intake_report::NutrientTrendOption,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientTrendEvent,
+        doseark_domain::daily_intake_report::NutrientTrendEvent,
+        doseark_domain::reports::daily_intake_report::NutrientTrendEvent,
+    );
+    assert_paths_match!(
+        doseark_domain::NutrientTrendDay,
+        doseark_domain::daily_intake_report::NutrientTrendDay,
+        doseark_domain::reports::daily_intake_report::NutrientTrendDay,
+    );
+}

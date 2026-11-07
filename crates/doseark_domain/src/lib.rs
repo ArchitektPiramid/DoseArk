@@ -1,26 +1,17 @@
-//! Shared DoseArk domain models.
+//! Shared domain entities and input contracts for DoseArk.
 //!
-//! This crate is the single source of truth for Rust-side entities and domain inputs.
-//! Keep transport DTOs in `doseark_contracts` and persistence-specific SQL rows in database adapters.
+//! Models are organized by catalog, dosing, inventory and reporting concerns.
+//! This crate defines data shapes, not database queries or transport-specific DTOs.
+//! The feature modules and former top-level type/module paths remain public to
+//! avoid changing imports in the API, application services or storage adapters.
 
-pub mod brand;
-pub mod daily_intake_report;
-pub mod dose_log;
-pub mod dose_log_nutrient;
-pub mod inventory_lot;
-pub mod nutrient;
-pub mod product;
-pub mod product_nutrient;
-pub mod stock_movement;
-pub mod storage_location;
+pub mod catalog;
+pub mod dosing;
+pub mod inventory;
+pub mod reports;
 
-pub use brand::*;
-pub use daily_intake_report::*;
-pub use dose_log::*;
-pub use dose_log_nutrient::*;
-pub use inventory_lot::*;
-pub use nutrient::*;
-pub use product::*;
-pub use product_nutrient::*;
-pub use stock_movement::*;
-pub use storage_location::*;
+// Keep `doseark_domain::Product` and `doseark_domain::product::Product` working
+pub use self::catalog::*;
+pub use self::dosing::*;
+pub use self::inventory::*;
+pub use self::reports::*;

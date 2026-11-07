@@ -1,7 +1,13 @@
+//! Named storage locations and the commands used to manage them.
+//!
+//! Locations provide optional display metadata and archive state; inventory
+//! lots refer to them through their identifiers when a location is assigned.
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// A named, optionally archived place where products are stored
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StorageLocation {
     pub id: Uuid,
@@ -19,6 +25,7 @@ pub struct StorageLocation {
     pub updated_at: DateTime<Utc>,
 }
 
+/// Data required to create a storage location
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateStorageLocationInput {
     pub name: String,
@@ -30,6 +37,7 @@ pub struct CreateStorageLocationInput {
     pub sort_order: Option<i32>,
 }
 
+/// Editable location attributes, including archive state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpdateStorageLocationInput {
     pub name: String,
