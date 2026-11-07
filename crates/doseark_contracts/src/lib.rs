@@ -1,8 +1,9 @@
-//! Shared transport contracts for DoseArk HTTP and Tauri IPC boundaries.
+//! Transport contracts shared by the DoseArk HTTP API and future Tauri IPC endpoints
 //!
-//! Keep domain rules and persistence models out of this crate. Types here are
-//! intentionally serialization-friendly request/response shapes.
+//! This crate defines serialization-only response shapes. Domain rules, storage
+//! models, and security-sensitive configuration resolution belong elsewhere.
 
 pub mod system;
 
+// Preserve root-level imports used by the API, e.g. doseark_contracts::HealthResponse
 pub use system::*;
