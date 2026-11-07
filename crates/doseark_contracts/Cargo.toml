@@ -1,6 +1,6 @@
 [package]
 name = "doseark_contracts"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
@@ -8,3 +8,6 @@ authors.workspace = true
 [dependencies]
 chrono.workspace = true
 serde.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
