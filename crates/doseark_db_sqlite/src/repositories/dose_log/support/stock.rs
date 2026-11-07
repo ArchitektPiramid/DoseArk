@@ -1,13 +1,14 @@
-// Odczyt, walidacja i aktualizacja stanu partii
+//! Odczyt i modyfikacja stanu partii podczas zapisu dawki
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
 use uuid::Uuid;
 
-use super::mapping::DoseInventoryLotRow;
+use super::super::mapping::DoseInventoryLotRow;
 
 /// reads the current lot balance inside the dose transaction
-pub(super) async fn get_lot(
+pub(in crate::repositories::dose_log) async fn get_lot(
     tx: &mut Transaction<'_, Sqlite>,
     lot_id: Uuid,
 ) -> ApplicationResult<DoseInventoryLotRow> {
@@ -26,7 +27,7 @@ pub(super) async fn get_lot(
 }
 
 /// Checks product ownership and available stock before a dose is applied
-pub(super) fn validate_lot_for_dose(
+pub(in crate::repositories::dose_log) fn validate_lot_for_dose(
     lot: Option<&DoseInventoryLotRow>,
     product_id: Uuid,
     units_taken: f64,
@@ -51,7 +52,7 @@ pub(super) fn validate_lot_for_dose(
 }
 
 /// Persists a new stock balance and adjusts empty/active status
-pub(super) async fn update_lot_stock(
+pub(in crate::repositories::dose_log) async fn update_lot_stock(
     tx: &mut Transaction<'_, Sqlite>,
     lot_id: Uuid,
     quantity_after: f64,

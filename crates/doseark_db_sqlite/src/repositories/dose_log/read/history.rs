@@ -1,12 +1,13 @@
-// historia dawek, paginacja i projekcja zapasów
+//! Pobieranie historii dawek z paginacją i stanem magazynu
+
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{DoseLog, DoseLogListInput, DoseLogPage};
 use sqlx::SqlitePool;
 
-use super::mapping::DoseLogHistoryRow;
+use super::super::mapping::DoseLogHistoryRow;
 
 /// Lists active doses with a projected stock balance for each history row
-pub(super) async fn list_dose_logs(
+pub(in crate::repositories::dose_log) async fn list_dose_logs(
     pool: &SqlitePool,
     input: DoseLogListInput,
 ) -> ApplicationResult<DoseLogPage> {

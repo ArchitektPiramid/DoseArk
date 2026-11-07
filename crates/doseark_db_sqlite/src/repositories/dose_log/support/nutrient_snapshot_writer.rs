@@ -1,3 +1,5 @@
+//! Utrwalanie historycznych ilości składników przyjętej dawki
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
@@ -20,7 +22,7 @@ struct ProductNutrientSnapshotSourceRow {
     reference_source: Option<String>,
 }
 
-pub(super) async fn insert_dose_log_nutrient_snapshots(
+pub(in crate::repositories::dose_log) async fn insert_dose_log_nutrient_snapshots(
     tx: &mut Transaction<'_, Sqlite>,
     dose_log_id: Uuid,
     product_id: Uuid,

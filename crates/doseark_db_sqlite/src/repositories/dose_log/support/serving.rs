@@ -1,11 +1,12 @@
-// Sprawdzanie mnożnika porcji
+//! Sprawdzanie wielkości porcji względem definicji produktu
+
 use doseark_application::{validated_serving_multiplier, ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
 use uuid::Uuid;
 
 /// Reads the persisted serving size and checks the client multiplier
 /// returns the accepted fraction of a serving, not the number of units
-pub(super) async fn validated_multiplier_for_product(
+pub(in crate::repositories::dose_log) async fn validated_multiplier_for_product(
     tx: &mut Transaction<'_, Sqlite>,
     product_id: Uuid,
     units_taken: f64,

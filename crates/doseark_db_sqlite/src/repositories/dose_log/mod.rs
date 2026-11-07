@@ -1,12 +1,9 @@
-mod cancel;
-mod create;
-mod history;
+//! Repozytorium historii dawek oraz operacji wpływających na stan magazynu
+
 mod mapping;
-mod nutrient_snapshot_writer;
-mod queries;
-mod serving;
-mod stock;
-mod update;
+mod read;
+mod support;
+mod write;
 
 use async_trait::async_trait;
 use doseark_application::{ApplicationResult, DoseLogRepository};
@@ -23,6 +20,7 @@ pub struct SqliteDoseLogRepository {
 }
 
 impl SqliteDoseLogRepository {
+    /// Wraps the pool shared by dose history and transaction handlers
     pub fn new(pool: SqlitePool) -> Self {
         Self { pool }
     }
@@ -31,11 +29,11 @@ impl SqliteDoseLogRepository {
 #[async_trait]
 impl DoseLogRepository for SqliteDoseLogRepository {
     async fn list_dose_logs(&self, input: DoseLogListInput) -> ApplicationResult<DoseLogPage> {
-        history::list_dose_logs(&self.pool, input).await
+        read::list_dose_logs(&self.pool, input).await
     }
 
     async fn create_dose_log(&self, input: CreateDoseLogInput) -> ApplicationResult<DoseLog> {
-        create::create_dose_log(&self.pool, input).await
+        write::create_dose_log(&self.pool, input).await
     }
 
     async fn update_dose_log(
@@ -43,10 +41,10 @@ impl DoseLogRepository for SqliteDoseLogRepository {
         id: Uuid,
         input: UpdateDoseLogInput,
     ) -> ApplicationResult<DoseLog> {
-        update::update_dose_log(&self.pool, id, input).await
+        write::update_dose_log(&self.pool, id, input).await
     }
 
     async fn cancel_dose_log(&self, id: Uuid) -> ApplicationResult<DoseLog> {
-        cancel::cancel_dose_log(&self.pool, id).await
+        write::cancel_dose_log(&self.pool, id).await
     }
 }

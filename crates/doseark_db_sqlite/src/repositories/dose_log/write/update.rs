@@ -1,21 +1,22 @@
-// edycja dawki i korekta magazynu
+//! Aktualizacja dawki, przeliczenie zapasów i zapis składników
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{DoseLog, UpdateDoseLogInput};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use super::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
-use super::queries::{get_dose_log, update_dose_log_row};
-use super::serving::validated_multiplier_for_product;
-use super::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
+use super::super::support::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
+use super::super::support::queries::{get_dose_log, update_dose_log_row};
+use super::super::support::serving::validated_multiplier_for_product;
+use super::super::support::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
 use crate::repositories::inventory_lot::normalize_stock_quantity;
 use crate::repositories::stock_movement::writer::{insert_stock_movement, InsertStockMovementInput};
 use crate::repositories::transaction::begin_immediate;
 
 /// Reverses the old stock usage before applying the edited dose
 /// Everything stays in one transaction so a failed edit leaves stock untouched
-pub(super) async fn update_dose_log(
+pub(in crate::repositories::dose_log) async fn update_dose_log(
     pool: &SqlitePool,
     id: Uuid,
     input: UpdateDoseLogInput,

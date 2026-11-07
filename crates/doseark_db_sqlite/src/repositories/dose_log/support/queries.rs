@@ -1,14 +1,15 @@
-// Podstawowe zapytania do tabeli dawek
+//! Zapytania zapisu, aktualizacji i odczytu rekordu dawki
+
 use chrono::{DateTime, Utc};
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{CreateDoseLogInput, UpdateDoseLogInput};
 use sqlx::{Sqlite, Transaction};
 use uuid::Uuid;
 
-use super::mapping::DoseLogRow;
+use super::super::mapping::DoseLogRow;
 
 /// Inserts the dose row; stock and nutrient snapshots are handled by the caller
-pub(super) async fn insert_dose_log(
+pub(in crate::repositories::dose_log) async fn insert_dose_log(
     tx: &mut Transaction<'_, Sqlite>,
     dose_log_id: Uuid,
     input: CreateDoseLogInput,
@@ -67,7 +68,7 @@ pub(super) async fn insert_dose_log(
 }
 
 /// Updates a dose row and returns its new persisted values
-pub(super) async fn update_dose_log_row(
+pub(in crate::repositories::dose_log) async fn update_dose_log_row(
     tx: &mut Transaction<'_, Sqlite>,
     id: Uuid,
     input: UpdateDoseLogInput,
@@ -121,7 +122,7 @@ pub(super) async fn update_dose_log_row(
 }
 
 /// Fetches a dose before editing or cancelling it
-pub(super) async fn get_dose_log(
+pub(in crate::repositories::dose_log) async fn get_dose_log(
     tx: &mut Transaction<'_, Sqlite>,
     id: Uuid,
 ) -> ApplicationResult<DoseLogRow> {

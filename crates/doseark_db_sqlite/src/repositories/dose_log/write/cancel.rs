@@ -1,19 +1,20 @@
-// anulowanie i przywrócenie zapasu
+//! Anulowanie dawki z przywróceniem zużytego zapasu
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::DoseLog;
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use super::mapping::DoseLogRow;
-use super::queries::get_dose_log;
-use super::stock::{get_lot, update_lot_stock};
+use super::super::mapping::DoseLogRow;
+use super::super::support::queries::get_dose_log;
+use super::super::support::stock::{get_lot, update_lot_stock};
 use crate::repositories::inventory_lot::normalize_stock_quantity;
 use crate::repositories::stock_movement::writer::{insert_stock_movement, InsertStockMovementInput};
 use crate::repositories::transaction::begin_immediate;
 
 /// Cancels a dose and restores its lot quantity within the same transaction
-pub(super) async fn cancel_dose_log(pool: &SqlitePool, id: Uuid) -> ApplicationResult<DoseLog> {
+pub(in crate::repositories::dose_log) async fn cancel_dose_log(pool: &SqlitePool, id: Uuid) -> ApplicationResult<DoseLog> {
     let now = Utc::now();
 
     tracing::info!(dose_log_id = %id, "Cancelling SQLite dose log");

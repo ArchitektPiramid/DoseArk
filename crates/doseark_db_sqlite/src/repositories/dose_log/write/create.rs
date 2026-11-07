@@ -1,20 +1,21 @@
-// Transakcja tworzenia dawki
+//! Tworzenie dawki oraz zapis powiązanych operacji w jednej transakcji
+
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{CreateDoseLogInput, DoseLog};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use super::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
-use super::queries::insert_dose_log;
-use super::serving::validated_multiplier_for_product;
-use super::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
+use super::super::support::nutrient_snapshot_writer::insert_dose_log_nutrient_snapshots;
+use super::super::support::queries::insert_dose_log;
+use super::super::support::serving::validated_multiplier_for_product;
+use super::super::support::stock::{get_lot, update_lot_stock, validate_lot_for_dose};
 use crate::repositories::inventory_lot::normalize_stock_quantity;
 use crate::repositories::stock_movement::writer::{insert_stock_movement, InsertStockMovementInput};
 use crate::repositories::transaction::begin_immediate;
 
 /// Creates the dose, snapshots nutrients and records any stock usage atomically
-pub(super) async fn create_dose_log(
+pub(in crate::repositories::dose_log) async fn create_dose_log(
     pool: &SqlitePool,
     input: CreateDoseLogInput,
 ) -> ApplicationResult<DoseLog> {
