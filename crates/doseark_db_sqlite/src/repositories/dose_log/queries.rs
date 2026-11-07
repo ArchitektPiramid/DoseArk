@@ -1,3 +1,4 @@
+// Podstawowe zapytania do tabeli dawek
 use chrono::{DateTime, Utc};
 use doseark_application::{ApplicationError, ApplicationResult};
 use doseark_domain::{CreateDoseLogInput, UpdateDoseLogInput};

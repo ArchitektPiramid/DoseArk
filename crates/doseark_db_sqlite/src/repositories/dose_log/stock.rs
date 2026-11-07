@@ -1,3 +1,4 @@
+// Odczyt, walidacja i aktualizacja stanu partii
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult};
 use sqlx::{Sqlite, Transaction};
