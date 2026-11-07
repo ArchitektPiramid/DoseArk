@@ -12,7 +12,9 @@ pub mod runtime;
 pub use self::database::{
     DatabaseOverviewResponse, DatabaseTableStatsResponse, StorageCapabilitiesResponse,
 };
-pub use self::health::{DatabaseHealthResponse, HealthResponse};
+pub use self::health::{
+    BackendComponentVersionsResponse, ComponentVersionResponse, DatabaseHealthResponse, HealthResponse,
+};
 pub use self::profiles::{ProfileValidationCheckResponse, ProfileValidationResponse};
 pub use self::runtime::{
     RuntimeConfigValueResponse, RuntimeConfigurationResponse, RuntimeEnvironmentVariableResponse,

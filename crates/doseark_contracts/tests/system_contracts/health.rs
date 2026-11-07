@@ -1,7 +1,9 @@
 //! Health responses retain their serialized keys and nullable database fields.
 
 use chrono::{DateTime, Utc};
-use doseark_contracts::{DatabaseHealthResponse, HealthResponse};
+use doseark_contracts::{
+    BackendComponentVersionsResponse, ComponentVersionResponse, DatabaseHealthResponse, HealthResponse,
+};
 use serde_json::{json, to_value};
 
 #[test]
@@ -13,7 +15,19 @@ fn health_response_keeps_nested_status_and_utc_timestamps() {
     let response = HealthResponse {
         status: "degraded".into(),
         service: "doseark-api".into(),
-        version: "0.1.0".into(),
+        version: "0.1.2".into(),
+        channel: "development".into(),
+        api: ComponentVersionResponse {
+            version: "0.1.2".into(),
+            channel: "development".into(),
+        },
+        backend_components: BackendComponentVersionsResponse {
+            domain: "0.1.1".into(),
+            application: "0.1.2".into(),
+            contracts: "0.1.2".into(),
+            db_postgres: "0.1.2".into(),
+            db_sqlite: "0.1.3".into(),
+        },
         storage_mode: "remote-sqlite".into(),
         checked_at: now.clone(),
         started_at: now,
@@ -38,7 +52,16 @@ fn health_response_keeps_nested_status_and_utc_timestamps() {
         json!({
             "status": "degraded",
             "service": "doseark-api",
-            "version": "0.1.0",
+            "version": "0.1.2",
+            "channel": "development",
+            "api": {"version": "0.1.2", "channel": "development"},
+            "backend_components": {
+                "domain": "0.1.1",
+                "application": "0.1.2",
+                "contracts": "0.1.2",
+                "db_postgres": "0.1.2",
+                "db_sqlite": "0.1.3"
+            },
             "storage_mode": "remote-sqlite",
             "checked_at": "2026-11-07T12:30:00Z",
             "started_at": "2026-11-07T12:30:00Z",

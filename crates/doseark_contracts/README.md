@@ -7,6 +7,10 @@ They do not contain domain rules, database access, or credential resolution.
 and profile validation. Existing crate-root and `system::*` imports remain valid.
 Outgoing responses intentionally derive `Serialize`, not `Deserialize`.
 
+The health response includes `channel`, `api` and `backend_components` metadata
+alongside its existing status and database fields. Component versions reflect
+the Cargo packages compiled into the running API.
+
 The API must redact credentials and sensitive environment values **before**
 constructing runtime configuration responses.
 

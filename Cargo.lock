@@ -315,7 +315,7 @@ dependencies = [
 
 [[package]]
 name = "doseark-api"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "axum",
@@ -352,7 +352,7 @@ dependencies = [
 
 [[package]]
 name = "doseark_contracts"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "chrono",
  "serde",
