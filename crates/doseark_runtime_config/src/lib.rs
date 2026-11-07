@@ -1,7 +1,8 @@
-//! File-backed runtime profile metadata and server/native-only credential resolution.
+//! Runtime profile metadata and credential lookup for Rust-only DoseArk hosts.
 //!
-//! Browser JavaScript must never read credential files. This crate is intended for
-//! Rust hosts such as the HTTP API and future Tauri runtimes.
+//! Profiles describe API connections and storage locations; credential references
+//! resolve separately from a local JSON file. Browser clients must never read that
+//! file or receive its secret values through transport responses.
 
 mod credentials;
 mod profiles;

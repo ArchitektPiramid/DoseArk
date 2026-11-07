@@ -1,8 +1,15 @@
+//! File-backed API profile definitions and lightweight loading checks.
+//!
+//! Both config versions 1 and 2 are supported. Optional fields retain their
+//! original JSON defaults for existing installations; database connectivity,
+//! paths and profile-specific settings are validated by the consuming runtime.
+
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Context};
 use serde::Deserialize;
 
+/// Root profile file with the selected default API profile.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfilesFile {
@@ -11,6 +18,7 @@ pub struct ProfilesFile {
     pub api_profiles: Vec<ProfileConfig>,
 }
 
+/// API connection preferences and optional storage configuration.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileConfig {
@@ -28,6 +36,7 @@ pub struct ProfileConfig {
     pub request_timeout_ms: u64,
     #[serde(default)]
     pub database: ProfileDatabaseConfig,
+    /// Key of an entry in the credentials file, not a secret value.
     #[serde(default)]
     pub credentials_ref: Option<String>,
     #[serde(default)]
@@ -36,6 +45,7 @@ pub struct ProfileConfig {
     pub attachments_path: Option<PathBuf>,
 }
 
+/// Backend-specific target details; unspecified values use legacy defaults.
 #[derive(Debug, Clone, Deserialize)]
 pub struct ProfileDatabaseConfig {
     #[serde(rename = "type", default = "default_database_type")]
@@ -65,6 +75,9 @@ impl Default for ProfileDatabaseConfig {
     }
 }
 
+/// Loads a profile file and verifies its version and default profile reference.
+///
+/// Other field checks are intentionally left to the HTTP API or native runtime.
 pub async fn load_profiles(path: &Path) -> anyhow::Result<ProfilesFile> {
     let raw = tokio::fs::read_to_string(path)
         .await
@@ -93,8 +106,22 @@ pub async fn load_profiles(path: &Path) -> anyhow::Result<ProfilesFile> {
     Ok(config)
 }
 
-fn default_mode() -> String { "web-remote".to_string() }
-fn default_health_path() -> String { "/api/health".to_string() }
-fn default_timeout() -> u64 { 5_000 }
-fn default_database_type() -> String { "auto".to_string() }
-fn default_ssl_mode() -> String { "prefer".to_string() }
+fn default_mode() -> String {
+    "web-remote".to_string()
+}
+
+fn default_health_path() -> String {
+    "/api/health".to_string()
+}
+
+fn default_timeout() -> u64 {
+    5_000
+}
+
+fn default_database_type() -> String {
+    "auto".to_string()
+}
+
+fn default_ssl_mode() -> String {
+    "prefer".to_string()
+}

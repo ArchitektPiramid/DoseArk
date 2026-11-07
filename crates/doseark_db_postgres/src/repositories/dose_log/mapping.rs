@@ -1,3 +1,5 @@
+//! PostgreSQL row mappings for dose history and locked inventory lots.
+
 use chrono::Utc;
 use doseark_application::ApplicationError;
 use doseark_domain::{DoseLog, DoseLogStatus};
@@ -112,6 +114,7 @@ pub(super) struct DoseInventoryLotRow {
     pub(super) id: Uuid,
     pub(super) product_id: Uuid,
     pub(super) units_remaining: f64,
+    pub(super) status: String,
 }
 
 fn dose_log_status_from_db(value: &str) -> Result<DoseLogStatus, ApplicationError> {

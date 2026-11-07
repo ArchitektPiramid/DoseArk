@@ -361,13 +361,14 @@ dependencies = [
 
 [[package]]
 name = "doseark_db_postgres"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "async-trait",
  "chrono",
  "doseark_application",
  "doseark_domain",
  "sqlx",
+ "tokio",
  "tracing",
  "uuid",
 ]
@@ -398,7 +399,7 @@ dependencies = [
 
 [[package]]
 name = "doseark_runtime_config"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "serde",
