@@ -7,6 +7,7 @@
 - Grouped HTTP routes and tests by responsibility; aligned `/api/health` with TypeScript contracts
 
 ### Fixed
+- Reloaded page datasets when the API profile changes
 - Ignored stale API responses during profile switches
 - Protected inventory lot ownership and active-lot dosing in SQLite and PostgreSQL
 - Preserved historical nutrient snapshots and aligned nutrient report date ranges

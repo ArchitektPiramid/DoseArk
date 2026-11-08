@@ -1,12 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+
+import { useApiProfiles } from "@/app/api_profiles";
 import { useBrandMutations } from "./useBrandMutations";
 import { useBrandSelection } from "./useBrandSelection";
 import { useBrandsLoader } from "./useBrandsLoader";
 
 export function useBrandsPageData() {
+  const { effectiveApiBaseUrl } = useApiProfiles();
   const loader = useBrandsLoader();
   const selection = useBrandSelection(loader.brands);
-  const didInitialLoad = useRef(false);
 
   async function loadBrands() {
     return loader.loadBrands();
@@ -20,21 +22,16 @@ export function useBrandsPageData() {
   });
 
   useEffect(() => {
-    if (didInitialLoad.current) return;
-
-    didInitialLoad.current = true;
-    void loadBrands();
-  }, []);
+    void loader.loadBrands();
+  }, [effectiveApiBaseUrl]);
 
   return {
     brands: loader.brands,
     status: loader.status,
     error: loader.error,
-
     selectedBrand: selection.selectedBrand,
     selectedBrandId: selection.selectedBrandId,
     setSelectedBrandId: selection.setSelectedBrandId,
-
     loadBrands,
     createBrand: mutations.createBrand,
     updateBrand: mutations.updateBrand,

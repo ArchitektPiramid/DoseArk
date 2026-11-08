@@ -1,7 +1,9 @@
 import type { Brand, DailyIntakeReport, DoseLog, InventoryLot, Product } from "@doseark/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useApiProfiles } from "@/app/api_profiles";
 import { apiClient } from "@/app/client";
+import { createRequestGate } from "@/core/async/requestGate";
 import { createLogger } from "@/core/logger/logger";
 import { getActivityStart, loadActivityDoses } from "../utils/dashboardActivity";
 
@@ -11,6 +13,7 @@ const RECENT_DOSE_LIMIT = 5;
 
 /** Loads the dashboard datasets and the recent activity window. */
 export function useDashboardData() {
+  const { effectiveApiBaseUrl } = useApiProfiles();
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [lots, setLots] = useState<InventoryLot[]>([]);
@@ -23,8 +26,26 @@ export function useDashboardData() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestGate = useRef(createRequestGate());
+  const activeProfileUrl = useRef(effectiveApiBaseUrl);
 
   const load = useCallback(async () => {
+    if (activeProfileUrl.current !== effectiveApiBaseUrl) {
+      activeProfileUrl.current = effectiveApiBaseUrl;
+      requestGate.current.invalidate();
+      setProducts([]);
+      setBrands([]);
+      setLots([]);
+      setActivityDoses([]);
+      setActivityTruncated(false);
+      setRecentDoses([]);
+      setInsightDoses([]);
+      setInsightTotal(0);
+      setTodayReport(null);
+      setHasLoaded(false);
+    }
+    const requestId = requestGate.current.begin();
+    const requestBaseUrl = apiClient.getBaseUrl();
     setIsLoading(true);
     setError(null);
 
@@ -48,16 +69,16 @@ export function useDashboardData() {
         apiClient.listDoseLogs({ limit: PAGE_SIZE, offset: 0 }),
         todayReportRequest,
       ]);
-      const activity = await loadActivityDoses(
-        firstPage, since,
+      const activity = await loadActivityDoses(firstPage, since,
         (offset) => apiClient.listDoseLogs({ limit: PAGE_SIZE, offset }),
       );
+      if (!requestGate.current.isCurrent(requestId) || requestBaseUrl !== apiClient.getBaseUrl()) return;
 
       setProducts(productRows);
       setBrands(brandRows);
       setLots(lotRows);
       setRecentDoses(firstPage.items.slice(0, RECENT_DOSE_LIMIT));
-      // The usage panel describes this bounded recent sample, not lifetime totals.
+      // The usage panel describes this bounded recent sample, not lifetime totals
       setInsightDoses(firstPage.items);
       setInsightTotal(firstPage.total);
       setActivityDoses(activity.doses);
@@ -73,23 +94,21 @@ export function useDashboardData() {
         activityTruncated: activity.truncated,
       });
     } catch (loadError) {
+      if (!requestGate.current.isCurrent(requestId) || requestBaseUrl !== apiClient.getBaseUrl()) return;
       const message = loadError instanceof Error ? loadError.message : "Dashboard data request failed.";
       setError(message);
       logger.warn("Dashboard data load failed", { message });
     } finally {
-      setIsLoading(false);
+      if (requestGate.current.isCurrent(requestId)) setIsLoading(false);
     }
-  }, []);
+  }, [effectiveApiBaseUrl]);
 
   useEffect(() => {
     void load();
+    return () => requestGate.current.invalidate();
   }, [load]);
 
-  const brandNameById = useMemo(
-    () => new Map(brands.map((brand) => [brand.id, brand.name])),
-    [brands],
-  );
-
+  const brandNameById = useMemo(() => new Map(brands.map((brand) => [brand.id, brand.name])), [brands]);
   const productNameById = useMemo(() => {
     const names = new Map<string, string>();
     for (const product of products) {

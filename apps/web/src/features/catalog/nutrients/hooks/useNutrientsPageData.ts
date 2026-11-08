@@ -1,12 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+
+import { useApiProfiles } from "@/app/api_profiles";
 import { useNutrientMutations } from "./useNutrientMutations";
 import { useNutrientSelection } from "./useNutrientSelection";
 import { useNutrientsLoader } from "./useNutrientsLoader";
 
 export function useNutrientsPageData() {
+  const { effectiveApiBaseUrl } = useApiProfiles();
   const loader = useNutrientsLoader();
   const selection = useNutrientSelection(loader.nutrients);
-  const didInitialLoad = useRef(false);
 
   async function loadNutrients() {
     return loader.loadNutrients();
@@ -20,21 +22,16 @@ export function useNutrientsPageData() {
   });
 
   useEffect(() => {
-    if (didInitialLoad.current) return;
-
-    didInitialLoad.current = true;
-    void loadNutrients();
-  }, []);
+    void loader.loadNutrients();
+  }, [effectiveApiBaseUrl]);
 
   return {
     nutrients: loader.nutrients,
     status: loader.status,
     error: loader.error,
-
     selectedNutrient: selection.selectedNutrient,
     selectedNutrientId: selection.selectedNutrientId,
     setSelectedNutrientId: selection.setSelectedNutrientId,
-
     loadNutrients,
     createNutrient: mutations.createNutrient,
     updateNutrient: mutations.updateNutrient,
