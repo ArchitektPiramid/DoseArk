@@ -5,4 +5,6 @@
 - Consolidate HTTP error responses and modularize profile, config and report helpers
 - Align health/version response with the TypeScript contract
 - Add tests for errors, profile validation and report boundaries
-- - Group HTTP routes by feature and move unit test files to `tests/unit/`
+- Group HTTP routes by feature and move unit test files to `tests/unit/`
+- Hide internal repository diagnostics from HTTP clients
+- Ignore symbolic links in backup listings and downloads
