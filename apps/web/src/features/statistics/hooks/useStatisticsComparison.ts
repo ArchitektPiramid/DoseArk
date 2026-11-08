@@ -1,8 +1,10 @@
 import type { NutrientTrendOption, NutrientTrendReport, Product } from "@doseark/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useApiProfiles } from "@/app/api_profiles";
 import { apiClient } from "@/app/client";
 import { createLogger } from "@/core/logger/logger";
+import { createStatisticsReportRequest } from "../utils/statisticsReportRequest";
 import type { StatisticsDateRange } from "../utils/statisticsRange";
 import {
   buildStatisticsNutrientKey,
@@ -12,7 +14,6 @@ import type { StatisticsDailyPoint } from "../utils/statisticsSeries";
 import type { StatisticsSource } from "./useStatistics";
 
 const logger = createLogger("statistics");
-
 type Status = "idle" | "loading" | "error";
 
 export type StatisticsComparisonOption = {
@@ -36,6 +37,7 @@ export function useStatisticsComparison({
   range,
   products,
 }: UseStatisticsComparisonInput) {
+  const { effectiveApiBaseUrl } = useApiProfiles();
   const [source, setSource] = useState<StatisticsSource>("product");
   const [nutrients, setNutrients] = useState<NutrientTrendOption[]>([]);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -57,14 +59,10 @@ export function useStatisticsComparison({
       })),
     [products],
   );
-
   const nutrientOptions = useMemo<StatisticsComparisonOption[]>(
     () =>
       nutrients.map((nutrient) => ({
-        key: buildStatisticsNutrientKey({
-          nutrientId: nutrient.nutrient_id,
-          unit: nutrient.unit,
-        }),
+        key: buildStatisticsNutrientKey({ nutrientId: nutrient.nutrient_id, unit: nutrient.unit }),
         label: nutrient.nutrient_display_name,
         unit: nutrient.unit,
       })),
@@ -80,33 +78,48 @@ export function useStatisticsComparison({
   const selectedUnit = selectedOptions[0]?.unit ?? null;
 
   useEffect(() => {
-    if (!enabled || source !== "product" || productInitializedRef.current || productOptions.length === 0) {
-      return;
-    }
+    discoveryRequestIdRef.current += 1;
+    seriesRequestIdRef.current += 1;
+    productInitializedRef.current = false;
+    nutrientInitializedRef.current = false;
+    setSelectedProductIds([]);
+    setSelectedNutrientKeys([]);
+    setNutrients([]);
+    setSeries([]);
+    setError(null);
+  }, [effectiveApiBaseUrl]);
+
+  useEffect(() => {
+    if (!enabled || source !== "product" || productOptions.length === 0) return;
+
+    const selectionStillAvailable = selectedProductIds.some((key) =>
+      productOptions.some((option) => option.key === key),
+    );
+    if (selectionStillAvailable) return;
+    // Preserve an intentional empty selection, but recover if the previous profile's IDs disappeared
+    if (productInitializedRef.current && selectedProductIds.length === 0) return;
+
     productInitializedRef.current = true;
     setSelectedProductIds([productOptions[0].key]);
-  }, [enabled, productOptions, source]);
+  }, [enabled, productOptions, selectedProductIds, source]);
 
   useEffect(() => {
     if (!enabled || source !== "nutrient") return;
-
     const requestId = ++discoveryRequestIdRef.current;
+    const requestBaseUrl = apiClient.getBaseUrl();
 
     async function discover() {
       setStatus("loading");
       setError(null);
-
       try {
-        const report = await apiClient.getNutrientTrendReport({
-          startDate: range.startDate,
-          endDate: range.endDate,
-          timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-          nutrientId: null,
-          productId: null,
-          unit: null,
-          dayStartHour: 0,
-        });
-        if (requestId !== discoveryRequestIdRef.current) return;
+        const report = await apiClient.getNutrientTrendReport(
+          createStatisticsReportRequest(range, { kind: "all" }),
+        );
+        if (
+          requestId !== discoveryRequestIdRef.current ||
+          requestBaseUrl !== apiClient.getBaseUrl()
+        )
+          return;
 
         setNutrients(report.nutrients);
         setSelectedNutrientKeys((current) => {
@@ -126,7 +139,11 @@ export function useStatisticsComparison({
         });
         setStatus("idle");
       } catch (loadError) {
-        if (requestId !== discoveryRequestIdRef.current) return;
+        if (
+          requestId !== discoveryRequestIdRef.current ||
+          requestBaseUrl !== apiClient.getBaseUrl()
+        )
+          return;
         logger.error("Failed to discover comparison nutrients", loadError);
         setStatus("error");
         setError(loadError instanceof Error ? loadError.message : "Unknown error");
@@ -137,7 +154,7 @@ export function useStatisticsComparison({
     return () => {
       discoveryRequestIdRef.current += 1;
     };
-  }, [enabled, range.endDate, range.startDate, source]);
+  }, [enabled, range.endDate, range.startDate, source, effectiveApiBaseUrl]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -145,20 +162,18 @@ export function useStatisticsComparison({
       setSeries([]);
       return;
     }
-
     const activeOptions = selectedOptions;
     if (activeOptions.length === 0) {
       setSeries([]);
       setStatus("idle");
       return;
     }
-
     const requestId = ++seriesRequestIdRef.current;
+    const requestBaseUrl = apiClient.getBaseUrl();
 
     async function loadSeries() {
       setStatus("loading");
       setError(null);
-
       try {
         const loaded = await Promise.all(
           activeOptions.map(async (option): Promise<StatisticsComparisonSeries> => {
@@ -173,12 +188,13 @@ export function useStatisticsComparison({
             };
           }),
         );
-        if (requestId !== seriesRequestIdRef.current) return;
-
+        if (requestId !== seriesRequestIdRef.current || requestBaseUrl !== apiClient.getBaseUrl())
+          return;
         setSeries(loaded);
         setStatus("idle");
       } catch (loadError) {
-        if (requestId !== seriesRequestIdRef.current) return;
+        if (requestId !== seriesRequestIdRef.current || requestBaseUrl !== apiClient.getBaseUrl())
+          return;
         logger.error("Failed to load comparison series", loadError);
         setStatus("error");
         setError(loadError instanceof Error ? loadError.message : "Unknown error");
@@ -189,7 +205,7 @@ export function useStatisticsComparison({
     return () => {
       seriesRequestIdRef.current += 1;
     };
-  }, [enabled, range.endDate, range.startDate, selectedOptions, source]);
+  }, [enabled, range.endDate, range.startDate, selectedOptions, source, effectiveApiBaseUrl]);
 
   function changeSource(nextSource: StatisticsSource) {
     if (nextSource === source) return;
@@ -201,19 +217,14 @@ export function useStatisticsComparison({
   function toggleSelection(key: string) {
     const option = options.find((item) => item.key === key);
     if (!option) return;
-
     const setter = source === "product" ? setSelectedProductIds : setSelectedNutrientKeys;
     setter((current) => {
-      if (current.includes(key)) {
-        return current.filter((item) => item !== key);
-      }
-
+      if (current.includes(key)) return current.filter((item) => item !== key);
       const currentOptions = current
         .map((item) => options.find((candidate) => candidate.key === item))
         .filter(isDefined);
       const activeUnit = currentOptions[0]?.unit ?? option.unit;
       if (option.unit !== activeUnit) return current;
-
       return [...current, key];
     });
   }
@@ -244,31 +255,24 @@ async function loadOptionReport(
   range: StatisticsDateRange,
 ): Promise<NutrientTrendReport> {
   if (source === "product") {
-    return apiClient.getNutrientTrendReport({
-      startDate: range.startDate,
-      endDate: range.endDate,
-      timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-      productId: option.key,
-      nutrientId: null,
-      unit: option.unit,
-      dayStartHour: 0,
-    });
+    return apiClient.getNutrientTrendReport(
+      createStatisticsReportRequest(range, {
+        kind: "product",
+        productId: option.key,
+        unit: option.unit,
+      }),
+    );
   }
 
   const selection = parseStatisticsNutrientKey(option.key);
-  if (!selection) {
-    throw new Error("Invalid nutrient selection");
-  }
-
-  return apiClient.getNutrientTrendReport({
-    startDate: range.startDate,
-    endDate: range.endDate,
-    timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-    productId: null,
-    nutrientId: selection.nutrientId,
-    unit: selection.unit,
-    dayStartHour: 0,
-  });
+  if (!selection) throw new Error("Invalid nutrient selection");
+  return apiClient.getNutrientTrendReport(
+    createStatisticsReportRequest(range, {
+      kind: "nutrient",
+      nutrientId: selection.nutrientId,
+      unit: selection.unit,
+    }),
+  );
 }
 
 function isDefined<T>(value: T | null | undefined): value is T {
