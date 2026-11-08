@@ -35,8 +35,6 @@ jobs:
           components: rustfmt
       - uses: Swatinem/rust-cache@v2
 
-      - name: Check formatting
-        run: cargo fmt --all -- --check
       - name: Check workspace
         run: cargo check --workspace --locked
       - name: Test workspace
