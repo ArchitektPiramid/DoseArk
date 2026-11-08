@@ -1,8 +1,4 @@
-import type {
-  InventoryLot,
-  InventoryLotStatus,
-  UpdateInventoryLotInput,
-} from "@doseark/types";
+import type { InventoryLot, InventoryLotStatus, UpdateInventoryLotInput } from "@doseark/types";
 
 import { formatEditableNumber, parseNumberInput } from "@/core/format";
 
@@ -55,13 +51,17 @@ export function inventoryLotToFormState(lot: InventoryLot): InventoryLotFormStat
   };
 }
 
-export function isInventoryLotFormValid(form: InventoryLotFormState): boolean {
+export function isInventoryLotFormValid(
+  form: InventoryLotFormState,
+  originalProductId?: string,
+): boolean {
   const unitsInitial = parseNumberInput(form.unitsInitial);
   const unitsRemaining = parseNumberInput(form.unitsRemaining);
   const priceAmount = parseOptionalNumber(form.priceAmount);
 
   return (
     form.productId.length > 0 &&
+    (originalProductId === undefined || form.productId === originalProductId) &&
     unitsInitial !== null &&
     unitsInitial > 0 &&
     unitsRemaining !== null &&
@@ -74,6 +74,7 @@ export function isInventoryLotFormValid(form: InventoryLotFormState): boolean {
 
 export function buildInventoryLotInput(
   form: InventoryLotFormState,
+  originalProductId?: string,
 ): UpdateInventoryLotInput | null {
   const unitsInitial = parseNumberInput(form.unitsInitial);
   const unitsRemaining = parseNumberInput(form.unitsRemaining);
@@ -81,6 +82,7 @@ export function buildInventoryLotInput(
 
   if (
     !form.productId ||
+    (originalProductId !== undefined && form.productId !== originalProductId) ||
     unitsInitial === null ||
     unitsInitial <= 0 ||
     unitsRemaining === null ||

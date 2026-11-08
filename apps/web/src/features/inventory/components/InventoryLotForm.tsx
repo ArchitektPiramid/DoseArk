@@ -9,7 +9,16 @@ import type {
 import { useEffect, useState } from "react";
 
 import { parseNumberInput } from "@/core/format";
-import { Button, Field, FormActions, FormSection, RequiredLabel, SelectInput, TextArea, TextInput } from "@/core/ui";
+import {
+  Button,
+  Field,
+  FormActions,
+  FormSection,
+  RequiredLabel,
+  SelectInput,
+  TextArea,
+  TextInput,
+} from "@/core/ui";
 
 import { InventoryLotStockPreview } from "./InventoryLotStockPreview";
 import { StorageLocationSelect } from "./StorageLocationSelect";
@@ -50,7 +59,9 @@ export function InventoryLotForm({
   const [form, setForm] = useState<InventoryLotFormState>(createEmptyInventoryLotFormState);
 
   useEffect(() => {
-    setForm(mode === "edit" && lot ? inventoryLotToFormState(lot) : createEmptyInventoryLotFormState());
+    setForm(
+      mode === "edit" && lot ? inventoryLotToFormState(lot) : createEmptyInventoryLotFormState(),
+    );
   }, [mode, lot]);
 
   const unitsInitial = parseNumberInput(form.unitsInitial);
@@ -61,7 +72,8 @@ export function InventoryLotForm({
     unitsRemaining === null ||
     unitsRemaining < 0 ||
     (unitsInitial !== null && unitsRemaining > unitsInitial);
-  const canSubmit = isInventoryLotFormValid(form);
+  const originalProductId = mode === "edit" ? lot?.product_id : undefined;
+  const canSubmit = isInventoryLotFormValid(form, originalProductId);
 
   function patchForm(patch: Partial<InventoryLotFormState>) {
     setForm((current) => ({ ...current, ...patch }));
@@ -79,12 +91,10 @@ export function InventoryLotForm({
   /** Persists a valid lot and notifies the editor without closing the page. */
   async function submit() {
     if (!canSubmit || disabled) return;
-    const input = buildInventoryLotInput(form);
+    const input = buildInventoryLotInput(form, originalProductId);
     if (!input) return;
 
-    const saved = mode === "edit" && lot
-      ? await onUpdate(lot.id, input)
-      : await onCreate(input);
+    const saved = mode === "edit" && lot ? await onUpdate(lot.id, input) : await onCreate(input);
 
     if (saved) {
       if (onSaved) onSaved();
@@ -106,6 +116,7 @@ export function InventoryLotForm({
             <SelectInput
               value={form.productId}
               required
+              disabled={mode === "edit" || disabled}
               aria-invalid={productMissing}
               onChange={(event) => patchForm({ productId: event.target.value })}
             >
@@ -119,7 +130,10 @@ export function InventoryLotForm({
           </Field>
 
           <Field label="Lot number">
-            <TextInput value={form.lotNumber} onChange={(event) => patchForm({ lotNumber: event.target.value })} />
+            <TextInput
+              value={form.lotNumber}
+              onChange={(event) => patchForm({ lotNumber: event.target.value })}
+            />
           </Field>
 
           <Field label="Storage location">
@@ -136,7 +150,9 @@ export function InventoryLotForm({
               onChange={(event) => patchForm({ status: event.target.value as InventoryLotStatus })}
             >
               {INVENTORY_LOT_STATUS_OPTIONS.map((status) => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </SelectInput>
           </Field>
@@ -174,19 +190,40 @@ export function InventoryLotForm({
       <FormSection title="Dates & purchase">
         <div className="mt-form-grid mt-inventory-form-grid--dates">
           <Field label="Purchase date">
-            <TextInput type="date" value={form.purchaseDate} onChange={(event) => patchForm({ purchaseDate: event.target.value })} />
+            <TextInput
+              type="date"
+              value={form.purchaseDate}
+              onChange={(event) => patchForm({ purchaseDate: event.target.value })}
+            />
           </Field>
           <Field label="Opened date">
-            <TextInput type="date" value={form.openedDate} onChange={(event) => patchForm({ openedDate: event.target.value })} />
+            <TextInput
+              type="date"
+              value={form.openedDate}
+              onChange={(event) => patchForm({ openedDate: event.target.value })}
+            />
           </Field>
           <Field label="Expires at">
-            <TextInput type="date" value={form.expiresAt} onChange={(event) => patchForm({ expiresAt: event.target.value })} />
+            <TextInput
+              type="date"
+              value={form.expiresAt}
+              onChange={(event) => patchForm({ expiresAt: event.target.value })}
+            />
           </Field>
           <Field label="Price">
-            <TextInput type="number" min={0} step={0.01} value={form.priceAmount} onChange={(event) => patchForm({ priceAmount: event.target.value })} />
+            <TextInput
+              type="number"
+              min={0}
+              step={0.01}
+              value={form.priceAmount}
+              onChange={(event) => patchForm({ priceAmount: event.target.value })}
+            />
           </Field>
           <Field label="Currency">
-            <TextInput value={form.priceCurrency} onChange={(event) => patchForm({ priceCurrency: event.target.value })} />
+            <TextInput
+              value={form.priceCurrency}
+              onChange={(event) => patchForm({ priceCurrency: event.target.value })}
+            />
           </Field>
         </div>
       </FormSection>
@@ -203,7 +240,9 @@ export function InventoryLotForm({
       </FormSection>
 
       <FormActions>
-        <Button type="button" onClick={onCancel} disabled={disabled}>Cancel</Button>
+        <Button type="button" onClick={onCancel} disabled={disabled}>
+          Cancel
+        </Button>
         <Button type="submit" variant="primary" disabled={!canSubmit || disabled}>
           {disabled ? "Saving..." : mode === "edit" ? "Save lot" : "Create lot"}
         </Button>
