@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
+import { useApiProfiles } from "@/app/api_profiles";
 import { useProductMutations } from "./useProductMutations";
 import { useProductSelection } from "./useProductSelection";
 import { useProductsLoader } from "./useProductsLoader";
 
 export function useProductsPageData() {
+  const { effectiveApiBaseUrl } = useApiProfiles();
   const loader = useProductsLoader();
   const selection = useProductSelection(loader.products);
-  const didInitialLoad = useRef(false);
 
   const brandNameById = useMemo(() => {
     return new Map(loader.brands.map((brand) => [brand.id, brand.name]));
@@ -26,24 +27,18 @@ export function useProductsPageData() {
   });
 
   useEffect(() => {
-    if (didInitialLoad.current) return;
-
-    didInitialLoad.current = true;
-    void loadAll();
-  }, []);
+    void loader.loadAll();
+  }, [effectiveApiBaseUrl]);
 
   return {
     products: loader.products,
     brands: loader.brands,
     status: loader.status,
     error: loader.error,
-
     selectedProduct: selection.selectedProduct,
     selectedProductId: selection.selectedProductId,
     setSelectedProductId: selection.setSelectedProductId,
-
     brandNameById,
-
     loadAll,
     createBrand: mutations.createBrand,
     createProduct: mutations.createProduct,

@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
@@ -42,7 +43,9 @@ export function ApiProfilesProvider({ children }: { children: ReactNode }) {
   const [selectedProfileId, setSelectedProfileIdState] = useState<string | null>(
     initialPreference.profileId,
   );
-  const [runtimeSource, setRuntimeSourceState] = useState<RuntimeSourceMode>(initialPreference.source);
+  const [runtimeSource, setRuntimeSourceState] = useState<RuntimeSourceMode>(
+    initialPreference.source,
+  );
   const [configSource, setConfigSource] = useState<RuntimeConfigSource | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,14 +60,12 @@ export function ApiProfilesProvider({ children }: { children: ReactNode }) {
         const fileProfiles = config.apiProfiles.map(normalizeRuntimeProfile);
         const defaultId = fileProfiles.some((profile) => profile.id === config.defaultApiProfileId)
           ? config.defaultApiProfileId
-          : fileProfiles[0]?.id ?? null;
+          : (fileProfiles[0]?.id ?? null);
 
         setProfiles(fileProfiles);
         setDefaultProfileId(defaultId);
         setSelectedProfileIdState((current) =>
-          current && fileProfiles.some((profile) => profile.id === current)
-            ? current
-            : defaultId,
+          current && fileProfiles.some((profile) => profile.id === current) ? current : defaultId,
         );
         setConfigSource(source);
         setError(null);
@@ -101,7 +102,8 @@ export function ApiProfilesProvider({ children }: { children: ReactNode }) {
     return getFallbackApiBaseUrl();
   }, [runtimeSource, selectedProfile]);
 
-  useEffect(() => {
+  // Apply the endpoint before descendant effects issue requests for the newly selected profile
+  useLayoutEffect(() => {
     setActiveApiBaseUrl(effectiveApiBaseUrl);
   }, [effectiveApiBaseUrl]);
 
@@ -120,37 +122,36 @@ export function ApiProfilesProvider({ children }: { children: ReactNode }) {
     setRuntimeSourceState(source);
   }, []);
 
-  const value = useMemo<ApiProfilesContextValue>(() => ({
-    profiles,
-    defaultProfileId,
-    selectedProfileId,
-    selectedProfile,
-    runtimeSource,
-    effectiveApiBaseUrl,
-    configSource,
-    isLoading,
-    error,
-    setSelectedProfileId,
-    setRuntimeSource,
-  }), [
-    profiles,
-    defaultProfileId,
-    selectedProfileId,
-    selectedProfile,
-    runtimeSource,
-    effectiveApiBaseUrl,
-    configSource,
-    isLoading,
-    error,
-    setSelectedProfileId,
-    setRuntimeSource,
-  ]);
-
-  return (
-    <ApiProfilesContext.Provider value={value}>
-      {children}
-    </ApiProfilesContext.Provider>
+  const value = useMemo<ApiProfilesContextValue>(
+    () => ({
+      profiles,
+      defaultProfileId,
+      selectedProfileId,
+      selectedProfile,
+      runtimeSource,
+      effectiveApiBaseUrl,
+      configSource,
+      isLoading,
+      error,
+      setSelectedProfileId,
+      setRuntimeSource,
+    }),
+    [
+      profiles,
+      defaultProfileId,
+      selectedProfileId,
+      selectedProfile,
+      runtimeSource,
+      effectiveApiBaseUrl,
+      configSource,
+      isLoading,
+      error,
+      setSelectedProfileId,
+      setRuntimeSource,
+    ],
   );
+
+  return <ApiProfilesContext.Provider value={value}>{children}</ApiProfilesContext.Provider>;
 }
 
 export function useApiProfiles(): ApiProfilesContextValue {
