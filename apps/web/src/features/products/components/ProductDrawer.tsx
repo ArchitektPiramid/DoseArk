@@ -73,6 +73,7 @@ export function ProductDrawer({
           brands={brands}
           disabled={saving}
           onCancel={onClose}
+          onSaved={onClose}
           onCreate={onCreate}
           onUpdate={onUpdate}
         />

@@ -1,14 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - 'release/**'
-      - 'feat/**'
-      - 'fix/**'
-      - 'refactor/**'
-      - 'docs/**'
   pull_request:
     branches:
       - main

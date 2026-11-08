@@ -61,7 +61,7 @@ export function validateProductForm(values: ProductFormValues) {
   };
 }
 
-/** Builds the API payload; optional fields stay null when empty. */
+/** Builds only fields supported by the product create/update API contracts. */
 export function buildProductInput(values: ProductFormValues): CreateProductInput | null {
   if (!validateProductForm(values).valid) return null;
   const servingSize = parseNumberInput(values.servingSize);
@@ -77,7 +77,6 @@ export function buildProductInput(values: ProductFormValues): CreateProductInput
     unit_weight_mg: parseNumberInput(values.unitWeightMg),
     barcode: values.barcode.trim() || null,
     description: values.description.trim() || null,
-    archived: values.archived,
     ui_color: values.uiColor || null,
     ui_icon: values.uiIcon || null,
     user_importance: values.userImportance,

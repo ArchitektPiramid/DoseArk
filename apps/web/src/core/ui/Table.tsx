@@ -41,7 +41,7 @@ export function Table<TKey extends string = string>({
 
               const sortable = column.sortKey !== undefined && onSortChange !== undefined;
               const active = sortable && sort?.key === column.sortKey;
-              const direction = active ? sort.direction : undefined;
+              const direction = active ? sort?.direction : undefined;
 
               return (
                 <th
