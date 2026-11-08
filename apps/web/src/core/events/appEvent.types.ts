@@ -8,6 +8,8 @@ export type AppEventSource =
   | "nutrients"
   | "inventory"
   | "dosing"
+  | "dashboard"
+  | "settings-backup"
   | "statistics"
   | "settings"
   | "storage";

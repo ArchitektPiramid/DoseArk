@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel outdated runs on the same branch or pull request.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Rust checks and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check workspace
+        run: cargo check --workspace --locked
+      - name: Test workspace
+        run: cargo test --workspace --locked
+
+  frontend:
+    name: Frontend checks and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.3
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check types and lint
+        run: pnpm check
+      - name: Build web app
+        run: pnpm build:web
+      - name: Run web unit tests
+        run: node --experimental-strip-types --test apps/web/tests/*.test.mjs
+
+  postgres:
+    name: PostgreSQL integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: doseark_ci
+          POSTGRES_PASSWORD: ci_only_password
+          POSTGRES_DB: doseark_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U doseark_ci -d doseark_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      # CI-only database; tests create and drop their own temporary schemas.
+      DOSEARK_PG_TEST_URL: postgres://doseark_ci:ci_only_password@localhost:5432/doseark_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run isolated PostgreSQL regressions
+        run: cargo test -p doseark_db_postgres --test postgres_integrity --locked -- --ignored --nocapture

@@ -49,7 +49,7 @@ test("valid form produces the existing API payload", () => {
   assert.equal(input.serving_size_units, 2);
   assert.equal(input.barcode, "12345");
   assert.equal(input.unit_weight_mg, null);
-  assert.equal(input.archived, false);
+  assert.equal("archived" in input, false);
 });
 
 test("optional weight is validated instead of silently discarded", () => {
@@ -77,4 +77,5 @@ test("existing product values are preserved in the editor", () => {
   const input = buildProductInput(values);
   assert.equal(input.description, "With food");
   assert.equal(input.user_importance, "high");
+  assert.equal("archived" in input, false);
 });

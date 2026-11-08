@@ -1,5 +1,4 @@
 import type {
-  CreateInventoryLotInput,
   InventoryLot,
   InventoryLotStatus,
   UpdateInventoryLotInput,
@@ -75,7 +74,7 @@ export function isInventoryLotFormValid(form: InventoryLotFormState): boolean {
 
 export function buildInventoryLotInput(
   form: InventoryLotFormState,
-): CreateInventoryLotInput | UpdateInventoryLotInput | null {
+): UpdateInventoryLotInput | null {
   const unitsInitial = parseNumberInput(form.unitsInitial);
   const unitsRemaining = parseNumberInput(form.unitsRemaining);
   const priceAmount = parseOptionalNumber(form.priceAmount);

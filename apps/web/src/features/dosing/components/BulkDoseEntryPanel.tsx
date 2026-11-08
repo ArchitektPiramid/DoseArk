@@ -333,17 +333,17 @@ function StatusIcon({ status, title }: { status: BulkDoseSaveStatus; title: stri
   const className = `mt-bulk-dose-card__status is-${status}`;
 
   if (status === "success") {
-    return <CheckCircle2 className={className} size={16} aria-label={title} title={title} />;
+    return <span title={title}><CheckCircle2 className={className} size={16} aria-label={title} /></span>;
   }
   if (status === "error") {
-    return <XCircle className={className} size={16} aria-label={title} title={title} />;
+    return <span title={title}><XCircle className={className} size={16} aria-label={title} /></span>;
   }
   if (status === "saving") {
     return (
-      <LoaderCircle className={`${className} is-spinning`} size={16} aria-label={title} title={title} />
+      <span title={title}><LoaderCircle className={`${className} is-spinning`} size={16} aria-label={title} /></span>
     );
   }
-  return <Circle className={className} size={15} aria-label={title} title={title} />;
+  return <span title={title}><Circle className={className} size={15} aria-label={title} /></span>;
 }
 
 function formatNumber(value: number): string {

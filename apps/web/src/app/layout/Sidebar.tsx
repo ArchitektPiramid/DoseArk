@@ -114,7 +114,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 title={`API — ${system.error ?? `last check ${formatCheckedAt(system.checkedAt)}`}`}
               >
                 <span className="mt-status-dot" aria-hidden="true" />
-                <span className="mt-sidebar__status-label">API v{system.health?.version ?? BACKEND_VERSION}</span>
+                <span className="mt-sidebar__status-label">API v{system.health?.version ?? "—"}</span>
               </div>
 
               <div
@@ -126,7 +126,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 }
               >
                 <span className="mt-status-dot" aria-hidden="true" />
-                <span className="mt-sidebar__status-label">DB v{system.health?.database.schema_version ?? DATABASE_SCHEMA_VERSION}</span>
+                <span className="mt-sidebar__status-label">DB v{system.health?.database.schema_version ?? "—"}</span>
               </div>
             </div>
           ) : null}
