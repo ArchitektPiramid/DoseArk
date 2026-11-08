@@ -1,3 +1,5 @@
+import type { NutrientTrendOption } from "@doseark/types";
+
 export type StatisticsNutrientSelection = {
   nutrientId: string;
   unit: string;
@@ -19,4 +21,17 @@ export function parseStatisticsNutrientKey(key: string | null): StatisticsNutrie
   if (!nutrientId || !unit) return null;
 
   return { nutrientId, unit };
+}
+
+/** Retains a selected nutrient only if both ID and unit still exist in the report. */
+export function resolveStatisticsNutrient(options: NutrientTrendOption[], key: string | null) {
+  const preferred = parseStatisticsNutrientKey(key);
+  const nutrient =
+    options.find(
+      (item) => item.nutrient_id === preferred?.nutrientId && item.unit === preferred?.unit,
+    ) ?? options[0] ?? null;
+  return {
+    nutrient,
+    key: nutrient ? buildStatisticsNutrientKey({ nutrientId: nutrient.nutrient_id, unit: nutrient.unit }) : null,
+  };
 }
