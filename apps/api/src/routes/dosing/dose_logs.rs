@@ -1,22 +1,20 @@
+//! Dose history HTTP routes for listing, creating, editing and cancellation.
+
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     routing::{get, post},
     Json, Router,
 };
-use serde::{Deserialize, Serialize};
 use doseark_domain::{
     CreateDoseLogInput, DoseLog, DoseLogListInput, DoseLogPage, UpdateDoseLogInput,
 };
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use crate::routes::error::{map_application_error, ApiError};
 
 #[derive(Debug, Deserialize)]
 struct DoseLogListQuery {
@@ -29,8 +27,14 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/dose-logs", get(list_dose_logs))
         .route("/api/dose-logs", post(create_dose_log))
-        .route("/api/dose-logs/{dose_log_id}", axum::routing::patch(update_dose_log))
-        .route("/api/dose-logs/{dose_log_id}", axum::routing::delete(cancel_dose_log))
+        .route(
+            "/api/dose-logs/{dose_log_id}",
+            axum::routing::patch(update_dose_log),
+        )
+        .route(
+            "/api/dose-logs/{dose_log_id}",
+            axum::routing::delete(cancel_dose_log),
+        )
 }
 
 async fn list_dose_logs(
@@ -51,7 +55,8 @@ async fn list_dose_logs(
     );
 
     state
-        .services.dose_logs
+        .services
+        .dose_logs
         .list_dose_logs(input)
         .await
         .map(Json)
@@ -70,7 +75,8 @@ async fn create_dose_log(
     );
 
     let dose_log = state
-        .services.dose_logs
+        .services
+        .dose_logs
         .create_dose_log(input)
         .await
         .map_err(map_application_error)?;
@@ -92,7 +98,8 @@ async fn update_dose_log(
     );
 
     state
-        .services.dose_logs
+        .services
+        .dose_logs
         .update_dose_log(dose_log_id, input)
         .await
         .map(Json)
@@ -109,25 +116,10 @@ async fn cancel_dose_log(
     );
 
     state
-        .services.dose_logs
+        .services
+        .dose_logs
         .cancel_dose_log(dose_log_id)
         .await
         .map(Json)
         .map_err(map_application_error)
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
-        }),
-    )
 }

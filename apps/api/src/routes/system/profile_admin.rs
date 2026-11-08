@@ -1,3 +1,7 @@
+//! Runtime profile configuration and validation HTTP routes.
+
+use crate::routes::error::ApiError;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -9,19 +13,12 @@ use doseark_contracts::{
     RuntimeConfigValueResponse, RuntimeEnvironmentVariableResponse,
 };
 use doseark_runtime_config::{load_profiles, CredentialsResolver};
-use serde::Serialize;
 
 use crate::{
     config::ConfigValueSource,
     profile_validation::validate_profile,
     state::AppState,
 };
-
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
 
 pub fn router() -> Router<AppState> {
     Router::new()

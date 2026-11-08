@@ -1,15 +1,24 @@
-use std::time::Duration;
+//! Runtime profile validation for HTTP administration endpoints.
+//!
+//! Dispatches profile checks by storage backend and reports diagnostic results.
+//! Each database probe has its own timeout; secret values are never returned.
+
+mod backup;
+mod credentials;
+mod postgres;
+mod sqlite;
 
 use doseark_application::EXPECTED_MIGRATION_REVISION;
-use sqlx::{
-    postgres::{PgConnectOptions, PgPoolOptions, PgSslMode},
-    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
+use doseark_runtime_config::{CredentialsResolver, ProfileConfig};
+
+use self::{
+    backup::validate_backup_path,
+    credentials::{resolve_credentials, validate_credentials},
+    postgres::validate_postgres,
+    sqlite::validate_sqlite,
 };
-use tokio::time::timeout;
-use uuid::Uuid;
 
-use doseark_runtime_config::{CredentialsResolver, ProfileConfig, ProfileCredentials};
-
+/// Named outcome of a profile diagnostic probe.
 #[derive(Debug, Clone)]
 pub struct ValidationCheck {
     pub key: &'static str,
@@ -62,273 +71,6 @@ pub async fn validate_profile(
     checks
 }
 
-struct CredentialsResolution {
-    check: ValidationCheck,
-    value: Option<ProfileCredentials>,
-}
-
-async fn resolve_credentials(
-    profile: &ProfileConfig,
-    resolver: &CredentialsResolver,
-) -> CredentialsResolution {
-    let Some(reference) = profile.credentials_ref.as_deref() else {
-        return CredentialsResolution {
-            check: ValidationCheck {
-                key: "credentials",
-                status: "warning",
-                message: "No credentialsRef configured; PostgreSQL validation will try without file credentials.".to_string(),
-            },
-            value: None,
-        };
-    };
-
-    match resolver.resolve(reference).await {
-        Ok(value) => CredentialsResolution {
-            check: credentials_success(reference, resolver, &value),
-            value: Some(value),
-        },
-        Err(error) => CredentialsResolution {
-            check: ValidationCheck {
-                key: "credentials",
-                status: "error",
-                message: format!("credentialsRef '{reference}' could not be resolved: {error}"),
-            },
-            value: None,
-        },
-    }
-}
-
-async fn validate_credentials(
-    profile: &ProfileConfig,
-    resolver: &CredentialsResolver,
-    required: bool,
-) -> ValidationCheck {
-    let Some(reference) = profile.credentials_ref.as_deref() else {
-        return ValidationCheck {
-            key: "credentials",
-            status: if required { "warning" } else { "skipped" },
-            message: if required {
-                "No credentialsRef configured.".to_string()
-            } else {
-                "SQLite does not require credentials.".to_string()
-            },
-        };
-    };
-
-    match resolver.resolve(reference).await {
-        Ok(value) => credentials_success(reference, resolver, &value),
-        Err(error) => ValidationCheck {
-            key: "credentials",
-            status: "error",
-            message: format!("credentialsRef '{reference}' could not be resolved: {error}"),
-        },
-    }
-}
-
-fn credentials_success(
-    reference: &str,
-    resolver: &CredentialsResolver,
-    value: &ProfileCredentials,
-) -> ValidationCheck {
-    ValidationCheck {
-        key: "credentials",
-        status: "ok",
-        message: format!(
-            "credentialsRef '{reference}' resolved server-side from {} (username {}, password {}, API token {}).",
-            resolver.path().display(),
-            presence(value.username.as_deref()),
-            presence(value.password.as_deref()),
-            presence(value.api_token.as_deref())
-        ),
-    }
-}
-
-async fn validate_sqlite(profile: &ProfileConfig) -> Vec<ValidationCheck> {
-    let mut checks = Vec::new();
-    let Some(path) = profile.database.path.as_ref() else {
-        checks.push(error_check("database", "SQLite profile has no database path."));
-        return checks;
-    };
-
-    if !path.exists() {
-        checks.push(error_check(
-            "database",
-            format!("SQLite file does not exist: {}", path.display()),
-        ));
-        return checks;
-    }
-
-    let options = SqliteConnectOptions::new()
-        .filename(path)
-        .read_only(true)
-        .create_if_missing(false);
-
-    let pool = match timeout(
-        Duration::from_secs(5),
-        SqlitePoolOptions::new().max_connections(1).connect_with(options),
-    )
-    .await
-    {
-        Ok(Ok(pool)) => pool,
-        Ok(Err(error)) => {
-            checks.push(error_check(
-                "database",
-                format!("SQLite could not be opened read-only: {error}"),
-            ));
-            return checks;
-        }
-        Err(_) => {
-            checks.push(error_check(
-                "database",
-                "SQLite validation timed out after 5 seconds.",
-            ));
-            return checks;
-        }
-    };
-
-    checks.push(ValidationCheck {
-        key: "database",
-        status: "ok",
-        message: format!("SQLite opened successfully: {}", path.display()),
-    });
-    checks.push(schema_check_sqlite(&pool).await);
-    pool.close().await;
-    checks
-}
-
-async fn schema_check_sqlite(pool: &sqlx::SqlitePool) -> ValidationCheck {
-    match sqlx::query_scalar::<_, i64>(
-        "SELECT COALESCE(MAX(version), 0) FROM _sqlx_migrations WHERE success = 1",
-    )
-    .fetch_one(pool)
-    .await
-    {
-        Ok(revision) => schema_result(revision),
-        Err(error) => error_check(
-            "schema",
-            format!("Could not inspect SQLite schema migrations: {error}"),
-        ),
-    }
-}
-
-async fn validate_postgres(
-    profile: &ProfileConfig,
-    credentials: Option<ProfileCredentials>,
-) -> Vec<ValidationCheck> {
-    let mut checks = Vec::new();
-    let Some(host) = profile.database.host.as_deref().filter(|value| !value.trim().is_empty()) else {
-        checks.push(error_check("database", "PostgreSQL profile has no host."));
-        return checks;
-    };
-    let database_name = profile.database.name.trim();
-    if database_name.is_empty() {
-        checks.push(error_check("database", "PostgreSQL profile has no database name."));
-        return checks;
-    }
-
-    let mut options = PgConnectOptions::new()
-        .host(host)
-        .port(profile.database.port.unwrap_or(5432))
-        .database(database_name)
-        .ssl_mode(postgres_ssl_mode(&profile.database.ssl_mode));
-
-    if let Some(credentials) = credentials {
-        if let Some(username) = credentials.username.as_deref().filter(|value| !value.is_empty()) {
-            options = options.username(username);
-        }
-        if let Some(password) = credentials.password.as_deref() {
-            options = options.password(password);
-        }
-    }
-
-    let pool = match timeout(
-        Duration::from_secs(5),
-        PgPoolOptions::new().max_connections(1).connect_with(options),
-    )
-    .await
-    {
-        Ok(Ok(pool)) => pool,
-        Ok(Err(error)) => {
-            checks.push(error_check(
-                "database",
-                format!("PostgreSQL connection failed: {error}"),
-            ));
-            return checks;
-        }
-        Err(_) => {
-            checks.push(error_check(
-                "database",
-                "PostgreSQL validation timed out after 5 seconds.",
-            ));
-            return checks;
-        }
-    };
-
-    checks.push(ValidationCheck {
-        key: "database",
-        status: "ok",
-        message: format!(
-            "PostgreSQL responded at {}:{}/{}.",
-            host,
-            profile.database.port.unwrap_or(5432),
-            database_name
-        ),
-    });
-    checks.push(schema_check_postgres(&pool).await);
-    pool.close().await;
-    checks
-}
-
-async fn schema_check_postgres(pool: &sqlx::PgPool) -> ValidationCheck {
-    match sqlx::query_scalar::<_, i64>(
-        "SELECT COALESCE(MAX(version), 0)::BIGINT FROM _sqlx_migrations WHERE success = TRUE",
-    )
-    .fetch_one(pool)
-    .await
-    {
-        Ok(revision) => schema_result(revision),
-        Err(error) => error_check(
-            "schema",
-            format!("Could not inspect PostgreSQL schema migrations: {error}"),
-        ),
-    }
-}
-
-async fn validate_backup_path(profile: &ProfileConfig) -> ValidationCheck {
-    let Some(path) = profile.backup_path.as_ref() else {
-        return ValidationCheck {
-            key: "backup",
-            status: "skipped",
-            message: "No backupPath configured in the profile preview.".to_string(),
-        };
-    };
-
-    if let Err(error) = tokio::fs::create_dir_all(path).await {
-        return error_check("backup", format!("Backup directory cannot be created: {error}"));
-    }
-
-    let probe = path.join(format!(".doseark-write-check-{}", Uuid::new_v4()));
-    match tokio::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&probe)
-        .await
-    {
-        Ok(_) => {
-            let _ = tokio::fs::remove_file(&probe).await;
-            ValidationCheck {
-                key: "backup",
-                status: "ok",
-                message: format!("Backup directory is writable: {}", path.display()),
-            }
-        }
-        Err(error) => error_check(
-            "backup",
-            format!("Backup directory is not writable: {error}"),
-        ),
-    }
-}
-
 fn schema_result(revision: i64) -> ValidationCheck {
     if revision == EXPECTED_MIGRATION_REVISION {
         ValidationCheck {
@@ -356,18 +98,6 @@ fn error_check(key: &'static str, message: impl Into<String>) -> ValidationCheck
     }
 }
 
-fn postgres_ssl_mode(value: &str) -> PgSslMode {
-    match value.trim().to_ascii_lowercase().as_str() {
-        "disable" => PgSslMode::Disable,
-        "require" => PgSslMode::Require,
-        _ => PgSslMode::Prefer,
-    }
-}
-
-fn presence(value: Option<&str>) -> &'static str {
-    if value.is_some_and(|value| !value.is_empty()) {
-        "set"
-    } else {
-        "not set"
-    }
-}
+#[cfg(test)]
+#[path = "../tests/unit/profile_validation.rs"]
+mod tests;

@@ -1,16 +1,17 @@
-pub mod brands;
-pub mod health;
-pub mod inventory_lots;
-pub mod nutrients;
-pub mod product_nutrients;
-pub mod products;
-pub mod stock_movements;
-pub mod dose_logs;
-pub mod dose_log_nutrients;
+//! HTTP endpoints grouped by application feature.
+//!
+//! Each group owns its Axum routers. Existing `routes::<endpoint>` paths remain
+//! available through re-exports so route registration does not need to change.
+
+mod error;
+
+pub mod catalog;
+pub mod dosing;
+pub mod inventory;
 pub mod reports;
-pub mod storage_locations;
-pub mod backups;
-pub mod database_admin;
+pub mod system;
 
-
-pub mod profile_admin;
+pub use self::catalog::{brands, nutrients, product_nutrients, products};
+pub use self::dosing::{dose_log_nutrients, dose_logs};
+pub use self::inventory::{inventory_lots, stock_movements, storage_locations};
+pub use self::system::{backups, database_admin, health, profile_admin};

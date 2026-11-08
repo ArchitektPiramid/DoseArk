@@ -1,34 +1,36 @@
+//! Storage location HTTP routes and query handling.
+
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     routing::{delete, get, patch, post},
     Json, Router,
 };
-use doseark_domain::{
-    CreateStorageLocationInput, StorageLocation, UpdateStorageLocationInput,
-};
-use serde::{Deserialize, Serialize};
+use doseark_domain::{CreateStorageLocationInput, StorageLocation, UpdateStorageLocationInput};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
+
+use crate::routes::error::{map_application_error, ApiError};
 
 #[derive(Debug, Deserialize)]
 struct ListStorageLocationsQuery {
     include_archived: Option<bool>,
 }
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
-
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/api/storage-locations", get(list_storage_locations))
         .route("/api/storage-locations", post(create_storage_location))
-        .route("/api/storage-locations/{storage_location_id}", patch(update_storage_location))
-        .route("/api/storage-locations/{storage_location_id}", delete(archive_storage_location))
+        .route(
+            "/api/storage-locations/{storage_location_id}",
+            patch(update_storage_location),
+        )
+        .route(
+            "/api/storage-locations/{storage_location_id}",
+            delete(archive_storage_location),
+        )
 }
 
 async fn list_storage_locations(
@@ -36,7 +38,8 @@ async fn list_storage_locations(
     Query(query): Query<ListStorageLocationsQuery>,
 ) -> Result<Json<Vec<StorageLocation>>, (StatusCode, Json<ApiError>)> {
     state
-        .services.storage_locations
+        .services
+        .storage_locations
         .list_storage_locations(query.include_archived.unwrap_or(false))
         .await
         .map(Json)
@@ -48,7 +51,8 @@ async fn create_storage_location(
     Json(input): Json<CreateStorageLocationInput>,
 ) -> Result<Json<StorageLocation>, (StatusCode, Json<ApiError>)> {
     state
-        .services.storage_locations
+        .services
+        .storage_locations
         .create_storage_location(input)
         .await
         .map(Json)
@@ -61,7 +65,8 @@ async fn update_storage_location(
     Json(input): Json<UpdateStorageLocationInput>,
 ) -> Result<Json<StorageLocation>, (StatusCode, Json<ApiError>)> {
     state
-        .services.storage_locations
+        .services
+        .storage_locations
         .update_storage_location(storage_location_id, input)
         .await
         .map(Json)
@@ -73,25 +78,10 @@ async fn archive_storage_location(
     Path(storage_location_id): Path<Uuid>,
 ) -> Result<Json<StorageLocation>, (StatusCode, Json<ApiError>)> {
     state
-        .services.storage_locations
+        .services
+        .storage_locations
         .archive_storage_location(storage_location_id)
         .await
         .map(Json)
         .map_err(map_application_error)
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
-        }),
-    )
 }

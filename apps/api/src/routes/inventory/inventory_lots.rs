@@ -1,3 +1,5 @@
+//! Inventory lot HTTP routes and stock-level requests.
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -5,16 +7,11 @@ use axum::{
     Json, Router,
 };
 use doseark_domain::{CreateInventoryLotInput, InventoryLot, UpdateInventoryLotInput};
-use serde::Serialize;
 use uuid::Uuid;
 
 use crate::state::AppState;
 
-#[derive(Debug, Serialize)]
-struct ApiError {
-    code: &'static str,
-    message: String,
-}
+use crate::routes::error::{map_application_error, ApiError};
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -29,7 +26,8 @@ async fn list_inventory_lots(
     tracing::debug!("API handler started: list inventory lots");
 
     state
-        .services.inventory_lots
+        .services
+        .inventory_lots
         .list_inventory_lots()
         .await
         .map(Json)
@@ -46,7 +44,8 @@ async fn create_inventory_lot(
     );
 
     let lot = state
-        .services.inventory_lots
+        .services
+        .inventory_lots
         .create_inventory_lot(input)
         .await
         .map_err(map_application_error)?;
@@ -66,25 +65,10 @@ async fn update_inventory_lot(
     );
 
     state
-        .services.inventory_lots
+        .services
+        .inventory_lots
         .update_inventory_lot(lot_id, input)
         .await
         .map(Json)
         .map_err(map_application_error)
-}
-
-fn map_application_error(error: doseark_application::ApplicationError) -> (StatusCode, Json<ApiError>) {
-    let status = match error {
-        doseark_application::ApplicationError::Validation(_) => StatusCode::BAD_REQUEST,
-        doseark_application::ApplicationError::NotFound(_) => StatusCode::NOT_FOUND,
-        doseark_application::ApplicationError::Repository(_) => StatusCode::INTERNAL_SERVER_ERROR,
-    };
-
-    (
-        status,
-        Json(ApiError {
-            code: "API_ERROR",
-            message: error.to_string(),
-        }),
-    )
 }

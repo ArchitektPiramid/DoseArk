@@ -23,12 +23,32 @@ pub struct DatabaseHealthResponse {
     pub error: Option<String>,
 }
 
-/// Public service status, including the nested database health result.
+/// Version metadata for the running HTTP API.
+#[derive(Debug, Clone, Serialize)]
+pub struct ComponentVersionResponse {
+    pub version: String,
+    pub channel: String,
+}
+
+/// Individual Rust component versions included in the current API build.
+#[derive(Debug, Clone, Serialize)]
+pub struct BackendComponentVersionsResponse {
+    pub domain: String,
+    pub application: String,
+    pub contracts: String,
+    pub db_postgres: String,
+    pub db_sqlite: String,
+}
+
+/// Public service status, including version metadata and database health.
 #[derive(Debug, Clone, Serialize)]
 pub struct HealthResponse {
     pub status: String,
     pub service: String,
     pub version: String,
+    pub channel: String,
+    pub api: ComponentVersionResponse,
+    pub backend_components: BackendComponentVersionsResponse,
     pub storage_mode: String,
     /// UTC timestamps serialized as RFC 3339 strings
     pub checked_at: DateTime<Utc>,

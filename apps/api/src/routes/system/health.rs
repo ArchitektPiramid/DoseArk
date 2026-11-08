@@ -1,9 +1,15 @@
+//! API health endpoint and storage migration compatibility diagnostics.
+//!
+//! Includes compiled component versions to match the shared TypeScript SystemHealth contract.
+
 use std::time::Instant;
 
 use axum::{extract::State, routing::get, Json, Router};
 use chrono::Utc;
 use doseark_application::{StorageEngine, DATABASE_SCHEMA_VERSION, EXPECTED_MIGRATION_REVISION};
-use doseark_contracts::{DatabaseHealthResponse, HealthResponse};
+use doseark_contracts::{
+    BackendComponentVersionsResponse, ComponentVersionResponse, DatabaseHealthResponse, HealthResponse,
+};
 
 use crate::{state::AppState, version};
 
@@ -72,6 +78,18 @@ async fn health(State(state): State<AppState>) -> Json<HealthResponse> {
         status: status.to_string(),
         service: "doseark-api".to_string(),
         version: version::BACKEND_VERSION.to_string(),
+        channel: version::CHANNEL.to_string(),
+        api: ComponentVersionResponse {
+            version: version::BACKEND_VERSION.to_string(),
+            channel: version::CHANNEL.to_string(),
+        },
+        backend_components: BackendComponentVersionsResponse {
+            domain: version::DOMAIN_VERSION.to_string(),
+            application: version::APPLICATION_VERSION.to_string(),
+            contracts: version::CONTRACTS_VERSION.to_string(),
+            db_postgres: version::DB_POSTGRES_VERSION.to_string(),
+            db_sqlite: version::DB_SQLITE_VERSION.to_string(),
+        },
         storage_mode: storage_mode(storage_engine).to_string(),
         checked_at,
         started_at,
@@ -86,3 +104,7 @@ const fn storage_mode(engine: StorageEngine) -> &'static str {
         StorageEngine::Sqlite => "remote-sqlite",
     }
 }
+
+#[cfg(test)]
+#[path = "../../../tests/unit/health.rs"]
+mod tests;
