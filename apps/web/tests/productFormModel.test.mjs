@@ -17,14 +17,18 @@ function loadModule(file, dependencies = {}) {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
   }).outputText;
   const module = { exports: {} };
-  vm.runInNewContext(js, {
-    module,
-    exports: module.exports,
-    require: (name) => {
-      if (!(name in dependencies)) throw new Error(`Unexpected import: ${name}`);
-      return dependencies[name];
+  vm.runInNewContext(
+    js,
+    {
+      module,
+      exports: module.exports,
+      require: (name) => {
+        if (!(name in dependencies)) throw new Error(`Unexpected import: ${name}`);
+        return dependencies[name];
+      },
     },
-  }, { filename: file });
+    { filename: file },
+  );
   return module.exports;
 }
 
@@ -43,13 +47,18 @@ test("default product needs a name", () => {
 });
 
 test("valid form produces the existing API payload", () => {
-  const values = { ...productFormValues(), name: "Vitamin C", servingSize: "2", barcode: "  12345  " };
+  const values = {
+    ...productFormValues(),
+    name: "Vitamin C",
+    servingSize: "2",
+    barcode: "  12345  ",
+  };
   const input = buildProductInput(values);
   assert.equal(input.name, "Vitamin C");
   assert.equal(input.serving_size_units, 2);
   assert.equal(input.barcode, "12345");
   assert.equal(input.unit_weight_mg, null);
-  assert.equal("archived" in input, false);
+  assert.equal(input.archived, false);
 });
 
 test("optional weight is validated instead of silently discarded", () => {
@@ -64,10 +73,19 @@ test("optional weight is validated instead of silently discarded", () => {
 
 test("existing product values are preserved in the editor", () => {
   const product = {
-    brand_id: "brand-1", name: "Magnesium", category: "supplement", dosage_form: "capsule",
-    serving_unit: "capsule", serving_size_units: 2, unit_weight_mg: 100,
-    barcode: "AAA", description: "With food", archived: true,
-    ui_color: "cyan", ui_icon: "moon", user_importance: "high",
+    brand_id: "brand-1",
+    name: "Magnesium",
+    category: "supplement",
+    dosage_form: "capsule",
+    serving_unit: "capsule",
+    serving_size_units: 2,
+    unit_weight_mg: 100,
+    barcode: "AAA",
+    description: "With food",
+    archived: true,
+    ui_color: "cyan",
+    ui_icon: "moon",
+    user_importance: "high",
   };
   const values = productFormValues(product);
   assert.equal(values.servingSize, "2");
@@ -77,5 +95,11 @@ test("existing product values are preserved in the editor", () => {
   const input = buildProductInput(values);
   assert.equal(input.description, "With food");
   assert.equal(input.user_importance, "high");
-  assert.equal("archived" in input, false);
+  assert.equal(input.archived, true);
+});
+
+test("archive selection supports both archiving and restoring a product", () => {
+  const values = { ...productFormValues(), name: "Test product", archived: true };
+  assert.equal(buildProductInput(values).archived, true);
+  assert.equal(buildProductInput({ ...values, archived: false }).archived, false);
 });

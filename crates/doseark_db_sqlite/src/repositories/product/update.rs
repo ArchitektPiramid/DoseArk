@@ -45,7 +45,8 @@ pub(super) async fn update_product(
             ui_color = ?11,
             ui_icon = ?12,
             user_importance = ?13,
-            updated_at = ?14
+            archived = COALESCE(?14, archived),
+            updated_at = ?15
         WHERE id = ?1
         RETURNING
             id,
@@ -79,6 +80,7 @@ pub(super) async fn update_product(
     .bind(input.ui_color)
     .bind(input.ui_icon)
     .bind(product_user_importance_to_db(&user_importance))
+    .bind(input.archived)
     .bind(now)
     .fetch_optional(pool)
     .await

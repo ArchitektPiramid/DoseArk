@@ -68,6 +68,7 @@ async fn sqlite_reports_match_daily_and_trend_boundaries() {
             ui_color: None,
             ui_icon: None,
             user_importance: None,
+            archived: None,
         })
         .await
         .expect("product should be created");

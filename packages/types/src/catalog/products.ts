@@ -44,6 +44,7 @@ export type CreateProductInput = {
   unit_weight_mg?: number | null;
   barcode?: string | null;
   description?: string | null;
+  archived?: boolean;
   ui_color: string | null;
   ui_icon: string | null;
   user_importance: ProductUserImportance;
@@ -59,6 +60,7 @@ export type UpdateProductInput = {
   unit_weight_mg?: number | null;
   barcode?: string | null;
   description?: string | null;
+  archived?: boolean;
   ui_color: string | null;
   ui_icon: string | null;
   user_importance: ProductUserImportance;

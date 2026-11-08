@@ -3,9 +3,7 @@ mod mapping;
 use async_trait::async_trait;
 use chrono::Utc;
 use doseark_application::{ApplicationError, ApplicationResult, ProductRepository};
-use doseark_domain::{
-    CreateProductInput, Product, ProductUserImportance, UpdateProductInput,
-};
+use doseark_domain::{CreateProductInput, Product, ProductUserImportance, UpdateProductInput};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -109,9 +107,9 @@ impl ProductRepository for PgProductRepository {
                 $11,
                 $12,
                 $13,
-                FALSE,
                 $14,
-                $15
+                $15,
+                $16
             )
             RETURNING
                 id,
@@ -145,6 +143,7 @@ impl ProductRepository for PgProductRepository {
         .bind(input.ui_color)
         .bind(input.ui_icon)
         .bind(product_user_importance_to_db(&user_importance))
+        .bind(input.archived.unwrap_or(false))
         .bind(now)
         .bind(now)
         .fetch_one(&self.pool)
@@ -156,7 +155,11 @@ impl ProductRepository for PgProductRepository {
         Product::try_from(row)
     }
 
-    async fn update_product(&self, id: Uuid, input: UpdateProductInput) -> ApplicationResult<Product> {
+    async fn update_product(
+        &self,
+        id: Uuid,
+        input: UpdateProductInput,
+    ) -> ApplicationResult<Product> {
         tracing::info!(
             product_id = %id,
             product_name = %input.name,
@@ -186,7 +189,8 @@ impl ProductRepository for PgProductRepository {
                 ui_color = $11,
                 ui_icon = $12,
                 user_importance = $13,
-                updated_at = $14
+                archived = COALESCE($14, archived),
+                updated_at = $15
             WHERE id = $1
             RETURNING
                 id,
@@ -220,6 +224,7 @@ impl ProductRepository for PgProductRepository {
         .bind(input.ui_color)
         .bind(input.ui_icon)
         .bind(product_user_importance_to_db(&user_importance))
+        .bind(input.archived)
         .bind(now)
         .fetch_optional(&self.pool)
         .await

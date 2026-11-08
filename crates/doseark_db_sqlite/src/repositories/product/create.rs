@@ -62,9 +62,9 @@ pub(super) async fn create_product(
             ?11,
             ?12,
             ?13,
-            FALSE,
             ?14,
-            ?15
+            ?15,
+            ?16
         )
         RETURNING
             id,
@@ -98,6 +98,7 @@ pub(super) async fn create_product(
     .bind(input.ui_color)
     .bind(input.ui_icon)
     .bind(product_user_importance_to_db(&user_importance))
+    .bind(input.archived.unwrap_or(false))
     .bind(now)
     .bind(now)
     .fetch_one(pool)

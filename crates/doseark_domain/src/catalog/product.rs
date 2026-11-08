@@ -80,6 +80,9 @@ pub struct CreateProductInput {
     pub unit_weight_mg: Option<f64>,
     pub barcode: Option<String>,
     pub description: Option<String>,
+    /// Omitted by older clients; new products default to active
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archived: Option<bool>,
     pub ui_color: Option<String>,
     pub ui_icon: Option<String>,
     pub user_importance: Option<ProductUserImportance>,
@@ -99,6 +102,9 @@ pub struct UpdateProductInput {
     pub unit_weight_mg: Option<f64>,
     pub barcode: Option<String>,
     pub description: Option<String>,
+    /// Omitted by older clients; the persisted state remains unchanged
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub archived: Option<bool>,
     pub ui_color: Option<String>,
     pub ui_icon: Option<String>,
     pub user_importance: Option<ProductUserImportance>,

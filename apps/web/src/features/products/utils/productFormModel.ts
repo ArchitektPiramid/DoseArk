@@ -77,6 +77,7 @@ export function buildProductInput(values: ProductFormValues): CreateProductInput
     unit_weight_mg: parseNumberInput(values.unitWeightMg),
     barcode: values.barcode.trim() || null,
     description: values.description.trim() || null,
+    archived: values.archived,
     ui_color: values.uiColor || null,
     ui_icon: values.uiIcon || null,
     user_importance: values.userImportance,

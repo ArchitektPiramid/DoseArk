@@ -1,18 +1,14 @@
+use doseark_db_sqlite::{create_sqlite_pool, run_migrations, SqliteStorage, SqliteStorageConfig};
 use doseark_domain::{
     CreateBrandInput, CreateNutrientInput, CreateProductInput, CreateStorageLocationInput,
-    DosageForm, NutrientKind, ProductCategory, SaveProductNutrientInput,
-};
-use doseark_db_sqlite::{
-    create_sqlite_pool, run_migrations, SqliteStorage, SqliteStorageConfig,
+    DosageForm, NutrientKind, ProductCategory, SaveProductNutrientInput, UpdateProductInput,
 };
 use uuid::Uuid;
 
 #[tokio::test]
 async fn sqlite_catalog_repositories_round_trip() {
-    let database_path = std::env::temp_dir().join(format!(
-        "doseark-sqlite-catalog-{}.db",
-        Uuid::new_v4()
-    ));
+    let database_path =
+        std::env::temp_dir().join(format!("doseark-sqlite-catalog-{}.db", Uuid::new_v4()));
     let config = SqliteStorageConfig::new(&database_path);
     let pool = create_sqlite_pool(&config)
         .await
@@ -75,9 +71,49 @@ async fn sqlite_catalog_repositories_round_trip() {
             ui_color: None,
             ui_icon: None,
             user_importance: None,
+            archived: None,
         })
         .await
         .expect("product should be created");
+
+    // Both archive and restore round-trip through the same repository as other fields
+    assert!(!product.archived);
+    let update_input = |archived: Option<bool>| UpdateProductInput {
+        brand_id: product.brand_id,
+        name: product.name.clone(),
+        category: ProductCategory::Supplement,
+        dosage_form: DosageForm::Tablet,
+        serving_unit: product.serving_unit.clone(),
+        serving_size_units: product.serving_size_units,
+        unit_weight_mg: product.unit_weight_mg,
+        barcode: product.barcode.clone(),
+        description: product.description.clone(),
+        ui_color: product.ui_color.clone(),
+        ui_icon: product.ui_icon.clone(),
+        user_importance: None,
+        archived,
+    };
+    let archived = repositories
+        .products
+        .update_product(product.id, update_input(Some(true)))
+        .await
+        .unwrap();
+    assert!(archived.archived);
+    let preserved = repositories
+        .products
+        .update_product(product.id, update_input(None))
+        .await
+        .unwrap();
+    assert!(
+        preserved.archived,
+        "Omitted archive state must not overwrite an existing value"
+    );
+    let restored = repositories
+        .products
+        .update_product(product.id, update_input(Some(false)))
+        .await
+        .unwrap();
+    assert!(!restored.archived);
 
     let composition = repositories
         .product_nutrients
@@ -110,8 +146,14 @@ async fn sqlite_catalog_repositories_round_trip() {
         .expect("storage location should be created");
 
     assert_eq!(repositories.brands.list_brands().await.unwrap().len(), 1);
-    assert_eq!(repositories.nutrients.list_nutrients().await.unwrap().len(), 1);
-    assert_eq!(repositories.products.list_products().await.unwrap().len(), 1);
+    assert_eq!(
+        repositories.nutrients.list_nutrients().await.unwrap().len(),
+        1
+    );
+    assert_eq!(
+        repositories.products.list_products().await.unwrap().len(),
+        1
+    );
     assert_eq!(composition.len(), 1);
     assert_eq!(location.name, "Kitchen");
 

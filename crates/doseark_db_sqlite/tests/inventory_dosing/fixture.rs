@@ -82,6 +82,7 @@ impl Fixture {
                 ui_color: None,
                 ui_icon: None,
                 user_importance: None,
+                archived: None,
             })
             .await
             .expect("product should be created");
@@ -216,6 +217,7 @@ impl Fixture {
                 ui_color: None,
                 ui_icon: None,
                 user_importance: None,
+                archived: None,
             })
             .await
             .expect("other product should be created")
