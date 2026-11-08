@@ -10,7 +10,9 @@ const dose = (product_id, hour, status = "active") => ({
 
 test("groups active dose events by product and by local hour", () => {
   const result = getDashboardUsageInsights([
-    dose("vitamin-c", 9), dose("vitamin-c", 9), dose("magnesium", 21),
+    dose("vitamin-c", 9),
+    dose("vitamin-c", 9),
+    dose("magnesium", 21),
   ]);
   assert.equal(result.activeDoses, 3);
   assert.deepEqual(result.topProducts, [
@@ -30,14 +32,25 @@ test("ignores cancelled and invalid records", () => {
   assert.equal(result.activeDoses, 0);
   assert.deepEqual(result.topProducts, []);
   assert.equal(result.peakHour, null);
-  assert.equal(result.hours.reduce((sum, count) => sum + count, 0), 0);
+  assert.equal(
+    result.hours.reduce((sum, count) => sum + count, 0),
+    0,
+  );
 });
 
 test("limits the ranking to five products without changing its count definition", () => {
   const result = getDashboardUsageInsights([
-    dose("d", 12), dose("c", 12), dose("b", 12), dose("a", 12),
-    dose("e", 12), dose("f", 12), dose("a", 12),
+    dose("d", 12),
+    dose("c", 12),
+    dose("b", 12),
+    dose("a", 12),
+    dose("e", 12),
+    dose("f", 12),
+    dose("a", 12),
   ]);
-  assert.deepEqual(result.topProducts.map((row) => row.productId), ["a", "b", "c", "d", "e"]);
+  assert.deepEqual(
+    result.topProducts.map((row) => row.productId),
+    ["a", "b", "c", "d", "e"],
+  );
   assert.equal(result.activeDoses, 7);
 });
