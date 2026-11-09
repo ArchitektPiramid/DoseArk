@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Changed
+- Split statistics subject and period controls
 - Separated statistics catalog and report state
 - Simplified statistics requests and comparison chart controls
 - Refactored Rust domain, application, contracts, runtime config, database adapters and API into focused modules
