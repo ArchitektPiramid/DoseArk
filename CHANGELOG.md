@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Changed
+- Isolated health polling and monitoring settings
 - Split statistics subject and period controls
 - Separated statistics catalog and report state
 - Simplified statistics requests and comparison chart controls
